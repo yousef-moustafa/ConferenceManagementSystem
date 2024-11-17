@@ -1,3 +1,7 @@
+package model.domain;
+
+import model.domain.enums.CertificateStatus;
+
 import java.util.*;
 
 public class Certificate {
@@ -32,6 +36,6 @@ public class Certificate {
     }
 
     public String generateCertificateText() {
-        return "Certificate for " + attendeeID + " from " + conferenceName + "\nIssued on: " + issueDate.toString();
+        return "model.domain.Certificate for " + attendeeID + " from " + conferenceName + "\nIssued on: " + issueDate.toString();
     }
 }

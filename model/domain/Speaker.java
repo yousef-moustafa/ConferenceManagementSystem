@@ -1,6 +1,10 @@
+package model.domain;
+
+import model.domain.enums.UserRole;
+
 import java.util.*;
 
-public class Speaker extends User{
+public class Speaker extends User {
     private String bio;
     private List<String> associatedSessionIDs;
 

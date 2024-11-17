@@ -1,3 +1,5 @@
+package view;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -18,7 +20,7 @@ public class LoginUI implements ActionListener {
 
     HashMap<String, String> logininfo = new HashMap<String, String>();
 
-    LoginUI(HashMap<String,String> credentials){
+    public LoginUI(HashMap<String,String> credentials){
         logininfo = credentials;
 
         userIDLabel.setBounds(50,100,75,25);
@@ -77,7 +79,7 @@ public class LoginUI implements ActionListener {
             }
             else {
                 messageLabel.setForeground(Color.red);
-                messageLabel.setText("User not found");
+                messageLabel.setText("model.domain.User not found");
             }
         }
 

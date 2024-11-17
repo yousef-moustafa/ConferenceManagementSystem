@@ -1,4 +1,6 @@
-public class CommentFeedback extends Feedback{
+package model.domain;
+
+public class CommentFeedback extends Feedback {
     private String comment;
 
     public CommentFeedback(String comment) {

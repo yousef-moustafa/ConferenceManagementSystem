@@ -1,9 +1,11 @@
+package view;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class RedirectUI {
     JFrame frame = new JFrame();
-    JLabel welcomeLabel = new JLabel("Welcome to Conference!");
+    JLabel welcomeLabel = new JLabel("Welcome to model.domain.Conference!");
 
     RedirectUI(String userID){
         welcomeLabel.setBounds(0,0,290,50);

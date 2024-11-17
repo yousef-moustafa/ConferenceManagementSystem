@@ -1,3 +1,7 @@
+package model.domain;
+
+import model.domain.enums.UserRole;
+
 import java.util.*;
 
 public class User {

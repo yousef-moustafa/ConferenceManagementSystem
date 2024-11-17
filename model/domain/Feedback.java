@@ -1,3 +1,5 @@
+package model.domain;
+
 import java.time.*;
 
 public class Feedback {

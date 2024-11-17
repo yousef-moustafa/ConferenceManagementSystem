@@ -1,3 +1,5 @@
+package model.domain;
+
 import java.util.*;
 
 public class Conference {

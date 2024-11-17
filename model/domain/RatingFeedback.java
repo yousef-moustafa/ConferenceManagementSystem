@@ -1,4 +1,6 @@
-public class RatingFeedback extends Feedback{
+package model.domain;
+
+public class RatingFeedback extends Feedback {
     private int rating;
     private int maxRating;
 

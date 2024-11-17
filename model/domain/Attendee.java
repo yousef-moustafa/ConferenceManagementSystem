@@ -1,6 +1,10 @@
+package model.domain;
+
+import model.domain.enums.UserRole;
+
 import java.util.*;
 
-public class Attendee extends User{
+public class Attendee extends User {
     private List<String> registeredSessionIDs;
     private String personalizedScheduleID;
     private String certificateID;

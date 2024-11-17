@@ -1,3 +1,7 @@
+package model.domain;
+
+import model.domain.enums.SessionStatus;
+
 import java.util.*;
 import java.time.*;
 
