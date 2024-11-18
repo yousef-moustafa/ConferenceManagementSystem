@@ -2,6 +2,9 @@ package model.domain;
 
 import model.domain.enums.SessionStatus;
 
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+
 import java.util.*;
 import java.time.*;
 
@@ -16,7 +19,16 @@ public class Session {
     private int capacity;
     private SessionStatus status;
 
+    private static int idCounter = 1;
+
     public Session() {
+        this.sessionID = generateSessionID();
+        this.attendeeIDs = new ArrayList<>();
+    }
+
+    // Generate Unique ID
+    private String generateSessionID() {
+        return "SESSION-" + idCounter++;
     }
 
     // Getters
@@ -84,4 +96,21 @@ public class Session {
     public void setStatus(SessionStatus status) {
         this.status = status;
     }
+
+    @Override
+    public String toString() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Formatting Date
+        DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm"); // Formatting LocalTime
+
+        // Format date and time, and include attendee count
+        return sessionName + ", "
+                + speakerID + ", "
+                + dateFormat.format(date) + ", "
+                + time.format(timeFormat) + ", "
+                + room + ", "
+                + status + ", "
+                + capacity + ", "
+                + "Attendees: " + attendeeIDs.size();
+    }
+
 }
