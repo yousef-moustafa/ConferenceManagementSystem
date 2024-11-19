@@ -1,17 +1,17 @@
 package model.domain;
 
 import model.domain.enums.UserRole;
-
+import java.time.LocalDate;
 import java.util.*;
 
 public class User {
     private String userID;
     private String userName;
     private String email;
-    private Date registrationDate;
+    private LocalDate registrationDate;
     private UserRole userRole;
 
-    public User(String userID, String userName, String email, Date registrationDate, UserRole userRole) {
+    public User(String userID, String userName, String email, LocalDate registrationDate, UserRole userRole) {
         this.userID = userID;
         this.userName = userName;
         this.email = email;
@@ -32,7 +32,7 @@ public class User {
         return email;
     }
 
-    public Date getRegistrationDate() {
+    public LocalDate getRegistrationDate() {
         return registrationDate;
     }
 
@@ -47,5 +47,10 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public String toString() {
+        return userID + ", " + userName + ", " + email + ", " + registrationDate + ", " + userRole;
     }
 }
