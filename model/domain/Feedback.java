@@ -8,6 +8,7 @@ public class Feedback {
     private LocalDateTime timestamp;
 
     public Feedback() {
+        this.timestamp = LocalDateTime.now();
     }
 
     // Getters
@@ -21,5 +22,14 @@ public class Feedback {
 
     public LocalDateTime getTimestamp() {
         return timestamp;
+    }
+
+    // Setters
+    public void setFeedbackID(String feedbackID) {
+        this.feedbackID = feedbackID;
+    }
+
+    public void setAttendeeID(String attendeeID) {
+        this.attendeeID = attendeeID;
     }
 }

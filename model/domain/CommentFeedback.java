@@ -7,8 +7,10 @@ public class CommentFeedback extends Feedback {
         this.comment = comment;
     }
 
-    public String getComment() {
-        return comment;
+    public CommentFeedback(String feedbackID, String attendeeID, String comment) {
+        setFeedbackID(feedbackID);
+        setAttendeeID(attendeeID);
+        this.comment = comment;
     }
 
     public void setComment(String comment) {
