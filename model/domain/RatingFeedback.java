@@ -1,12 +1,11 @@
 package model.domain;
 
 public class RatingFeedback extends Feedback {
-    private int rating;
+    private final int rating;
     private final int maxRating = 5; // Default maximum rating
 
     public RatingFeedback(String feedbackID, String attendeeID, int rating) {
-        setFeedbackID(feedbackID);
-        setAttendeeID(attendeeID);
+        super(feedbackID, attendeeID);
         this.rating = rating;
     }
 
@@ -15,15 +14,12 @@ public class RatingFeedback extends Feedback {
         return rating;
     }
 
-    public void setRating(int rating) {
-        if (rating >= 0 && rating <= maxRating) {
-            this.rating = rating;
-        } else {
-            throw new IllegalArgumentException("Rating must be between 0 and " + maxRating);
-        }
-    }
-
     public int getMaxRating() {
         return maxRating;
+    }
+
+    @Override
+    public String toString() {
+        return "RATING, " + super.toString() + ", " + rating;
     }
 }

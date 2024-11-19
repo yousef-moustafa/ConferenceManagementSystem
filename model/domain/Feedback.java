@@ -1,13 +1,16 @@
 package model.domain;
 
-import java.time.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-public class Feedback {
-    private String feedbackID;
-    private String attendeeID;
-    private LocalDateTime timestamp;
+public abstract class Feedback {
+    private final String feedbackID;
+    private final String attendeeID;
+    private final LocalDateTime timestamp;
 
-    public Feedback() {
+    public Feedback(String feedbackID, String attendeeID) {
+        this.feedbackID = feedbackID;
+        this.attendeeID = attendeeID;
         this.timestamp = LocalDateTime.now();
     }
 
@@ -24,12 +27,8 @@ public class Feedback {
         return timestamp;
     }
 
-    // Setters
-    public void setFeedbackID(String feedbackID) {
-        this.feedbackID = feedbackID;
-    }
-
-    public void setAttendeeID(String attendeeID) {
-        this.attendeeID = attendeeID;
+    @Override
+    public String toString() {
+        return feedbackID + ", " + attendeeID + ", " + timestamp.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 }
