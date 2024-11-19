@@ -37,7 +37,7 @@ public class Attendee extends User {
 
     @Override
     public String toString() {
-        return "ATTENDEE, " + super.toString() + ", " + String.join(" ", registeredSessionIDs) + ", " + personalizedScheduleID + ", " + certificateID + ", " + feedbackID;
+        return super.toString() + ", " + String.join(" ", registeredSessionIDs) + ", " + personalizedScheduleID + ", " + certificateID + ", " + feedbackID;
     }
 }
 
