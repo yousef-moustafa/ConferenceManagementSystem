@@ -27,6 +27,10 @@ public class Attendee extends User {
         return personalizedScheduleID;
     }
 
+    public void setPersonalizedScheduleID(String personalizedScheduleID) { // Add this setter
+        this.personalizedScheduleID = personalizedScheduleID;
+    }
+
     public String getCertificateID() {
         return certificateID;
     }
