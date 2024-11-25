@@ -1,7 +1,9 @@
 package model.service;
+
 import model.domain.Conference;
 import model.dto.ConferenceDTO;
 import model.repository.ConferenceRepository;
+import model.dto.DTOMapper;
 
 public class ConferenceService {
     private final ConferenceRepository conferenceRepository;
@@ -12,11 +14,8 @@ public class ConferenceService {
 
     // Initialize a new conference
     public void initializeConference(ConferenceDTO conferenceDTO) {
-        Conference conference = new Conference();
-        conference.setConferenceName(conferenceDTO.getConferenceName());
-        conference.setStartDate(conferenceDTO.getStartDate());
-        conference.setEndDate(conferenceDTO.getEndDate());
-
+        // Use DTOMapper to convert ConferenceDTO to Conference
+        Conference conference = DTOMapper.mapDTOToConference(conferenceDTO);
         conferenceRepository.save(conference);
     }
 
@@ -32,14 +31,12 @@ public class ConferenceService {
     }
 
 
+    // Retrieve conference details
     public ConferenceDTO getConferenceDetails() {
+        // Find the conference
         Conference conference = conferenceRepository.findAll().stream().findFirst().orElse(null);
         if (conference != null) {
-            return new ConferenceDTO(
-                    conference.getConferenceName(),
-                    conference.getStartDate(),
-                    conference.getEndDate()
-            );
+            return DTOMapper.mapConferenceToDTO(conference);
         }
         return null;
     }
@@ -49,6 +46,7 @@ public class ConferenceService {
     public void deleteConference() {
         Conference conference = conferenceRepository.findAll().stream().findFirst().orElse(null);
         if (conference != null) {
+            // Delete by conferenceID
             conferenceRepository.delete(conference.getConferenceID());
         }
     }

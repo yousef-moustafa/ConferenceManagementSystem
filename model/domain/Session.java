@@ -68,6 +68,10 @@ public class Session {
         return attendeeIDs.size();
     }
 
+    public List<String> getAttendeeIDs() {
+        return attendeeIDs;
+    }
+
     // Setters
     public void setSessionName(String sessionName) {
         this.sessionName = sessionName;
