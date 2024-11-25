@@ -30,6 +30,10 @@ public class Conference {
         return endDate;
     }
 
+    public List<String> getAttendeeIDs() { return attendeeIDs; }
+
+    public List<String> getSessionIDs() { return sessionIDs; }
+
     // Setters
     public void setConferenceName(String conferenceName) {
         this.conferenceName = conferenceName;

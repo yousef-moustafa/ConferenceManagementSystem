@@ -1,23 +1,40 @@
 package model.dto;
+import model.domain.enums.SessionStatus;
+
 import java.util.Date;
 import java.time.LocalTime;
 
 public class SessionDTO {
+    private String sessionID;
     private String sessionName;
-    private String speakerName;
+    private String speakerID;
     private Date date;
     private LocalTime time;
     private String room;
     private int capacity;
+    private SessionStatus status;
 
     public SessionDTO() {}
 
+    public SessionDTO(String sessionID, String sessionName, String speakerID, Date date, LocalTime time, String room, int capacity, SessionStatus status) {
+        this.sessionID = sessionID;
+        this.sessionName = sessionName;
+        this.speakerID = speakerID;
+        this.date = date;
+        this.time = time;
+        this.room = room;
+        this.capacity = capacity;
+        this.status = status;
+    }
+
     // Getters and setters
+    public String getSessionID() { return sessionID; }
+
     public String getSessionName() { return sessionName; }
     public void setSessionName(String sessionName) { this.sessionName = sessionName; }
 
-    public String getSpeakerName() { return speakerName; }
-    public void setSpeakerName(String speakerName) { this.speakerName = speakerName; }
+    public String getSpeakerID() { return speakerID; }
+    public void setSpeakerID(String speakerID) { this.speakerID = speakerID; }
 
     public Date getDate() { return date; }
     public void setDate(Date date) { this.date = date; }
@@ -30,5 +47,22 @@ public class SessionDTO {
 
     public int getCapacity() { return capacity; }
     public void setCapacity(int capacity) { this.capacity = capacity; }
+
+    public SessionStatus getStatus() { return status; }
+    public void setStatus(SessionStatus status) { this.status = status; }
+
+    @Override
+    public String toString() {
+        return "SessionDTO{" +
+                "sessionID='" + sessionID + '\'' +
+                ", sessionName='" + sessionName + '\'' +
+                ", speakerID='" + speakerID + '\'' +
+                ", date=" + date +
+                ", time=" + time +
+                ", room='" + room + '\'' +
+                ", capacity=" + capacity +
+                ", status=" + status +
+                '}';
+    }
 }
 

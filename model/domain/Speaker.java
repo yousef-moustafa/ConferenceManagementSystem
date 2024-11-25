@@ -27,4 +27,8 @@ public class Speaker extends User {
     public String toString() {
         return super.toString() + ", " + bio + ", " + String.join(" ", associatedSessionIDs);
     }
+
+    public List<String> getAssociatedSessionIDs() {
+        return associatedSessionIDs;
+    }
 }

@@ -6,7 +6,6 @@ public class ConferenceDTO {
     private Date startDate;
     private Date endDate;
 
-    // Default constructor
     public ConferenceDTO() {}
 
     public ConferenceDTO(String conferenceName, Date startDate, Date endDate) {
@@ -24,4 +23,13 @@ public class ConferenceDTO {
 
     public Date getEndDate() { return endDate; }
     public void setEndDate(Date endDate) { this.endDate = endDate; }
+
+    @Override
+    public String toString() {
+        return "ConferenceDTO{" +
+                "conferenceName='" + conferenceName + '\'' +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                '}';
+    }
 }
