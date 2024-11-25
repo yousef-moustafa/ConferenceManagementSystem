@@ -38,9 +38,7 @@ public class ConferenceService {
             return new ConferenceDTO(
                     conference.getConferenceName(),
                     conference.getStartDate(),
-                    conference.getEndDate(),
-                    conference.getSessionIDs(),
-                    conference.getAttendeeIDs()
+                    conference.getEndDate()
             );
         }
         return null;
