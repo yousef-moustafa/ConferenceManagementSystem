@@ -60,7 +60,7 @@ public class DTOMapper {
     }
 
 
-    public static Attendee mapDTOToAttendee(AttendeeDTO dto) {
+    public static Attendee mapDTOToAttendee(AttendeeDTO dto, String password) { // Added password parameter
         if (dto == null) {
             return null;
         }
@@ -69,6 +69,7 @@ public class DTOMapper {
                 null,
                 dto.getName(),
                 dto.getEmail(),
+                password,
                 LocalDate.now(),
                 dto.getRegisteredSessionIDs(),
                 null,
@@ -91,7 +92,7 @@ public class DTOMapper {
         );
     }
 
-    public static Speaker mapDTOToSpeaker(SpeakerDTO dto) {
+    public static Speaker mapDTOToSpeaker(SpeakerDTO dto, String password) { // Added password parameter
         if (dto == null) {
             return null;
         }
@@ -100,6 +101,7 @@ public class DTOMapper {
                 null,
                 dto.getName(),
                 dto.getEmail(),
+                password,
                 LocalDate.now(),
                 dto.getBio(),
                 dto.getAssociatedSessionIDs()

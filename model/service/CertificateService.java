@@ -118,7 +118,7 @@ public class CertificateService {
         return certificate.getStatus() == CertificateStatus.SENT || certificate.getStatus() == CertificateStatus.VALIDATED;
     }
 
-    // Helper method to get attendee's email by their ID
+    // Helper methods
     private String getAttendeeEmailById(String attendeeID) {
         User user = userRepository.findById(attendeeID);
         if (user instanceof Attendee) {

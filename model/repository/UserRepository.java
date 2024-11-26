@@ -55,20 +55,20 @@ public class UserRepository implements Repository<User> {
                 String userID = data[0];
                 String userName = data[1];
                 String email = data[2];
-                LocalDate registrationDate = LocalDate.parse(data[3]);
-                UserRole role = UserRole.valueOf(data[4].toUpperCase());
+                String password = data[3]; // Add password parsing
+                LocalDate registrationDate = LocalDate.parse(data[4]);
+                UserRole role = UserRole.valueOf(data[5].toUpperCase());
 
-                // Create user based on role
                 if (role == UserRole.SPEAKER) {
-                    String bio = data[5];
-                    List<String> associatedSessionIDs = Arrays.asList(data[6].split(" ")); // Assumed sessions are space-separated
-                    users.add(new Speaker(userID, userName, email, registrationDate, bio, associatedSessionIDs));
+                    String bio = data[6];
+                    List<String> associatedSessionIDs = Arrays.asList(data[7].split(" ")); // Space-separated session IDs
+                    users.add(new Speaker(userID, userName, email, password, registrationDate, bio, associatedSessionIDs));
                 } else if (role == UserRole.ATTENDEE) {
-                    List<String> registeredSessionIDs = Arrays.asList(data[5].split(" "));
-                    String personalizedScheduleID = data[6];
-                    String certificateID = data[7];
-                    String feedbackID = data[8];
-                    users.add(new Attendee(userID, userName, email, registrationDate, registeredSessionIDs, personalizedScheduleID, certificateID, feedbackID));
+                    List<String> registeredSessionIDs = Arrays.asList(data[6].split(" "));
+                    String personalizedScheduleID = data[7];
+                    String certificateID = data[8];
+                    String feedbackID = data[9];
+                    users.add(new Attendee(userID, userName, email, password, registrationDate, registeredSessionIDs, personalizedScheduleID, certificateID, feedbackID));
                 }
             }
         } catch (IOException e) {
@@ -85,5 +85,14 @@ public class UserRepository implements Repository<User> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public User findByEmail(String email) {
+        for (User user : users) {
+            if (user.getEmail().equalsIgnoreCase(email)) {
+                return user;
+            }
+        }
+        return null;
     }
 }

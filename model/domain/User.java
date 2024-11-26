@@ -8,13 +8,15 @@ public class User {
     private String userID;
     private String userName;
     private String email;
+    private String password;
     private LocalDate registrationDate;
     private UserRole userRole;
 
-    public User(String userID, String userName, String email, LocalDate registrationDate, UserRole userRole) {
+    public User(String userID, String userName, String email, String password, LocalDate registrationDate, UserRole userRole) {
         this.userID = userID;
         this.userName = userName;
         this.email = email;
+        this.password = password;
         this.registrationDate = registrationDate;
         this.userRole = userRole;
     }
@@ -45,12 +47,19 @@ public class User {
         this.userName = userName;
     }
 
+    public void setPassword(String password) { this.password = password; }
+
     public void setEmail(String email) {
         this.email = email;
     }
 
+    public boolean verifyPassword(String password) {
+        return this.password.equals(password); // Replace with hashing logic later
+    }
+
+
     @Override
     public String toString() {
-        return userID + ", " + userName + ", " + email + ", " + registrationDate + ", " + userRole;
+        return userID + ", " + userName + ", " + email + ", " + password + ", " + registrationDate + ", " + userRole;
     }
 }
