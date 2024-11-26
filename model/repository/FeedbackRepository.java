@@ -49,15 +49,14 @@ public class FeedbackRepository implements Repository<Feedback> {
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(", ");
                 String type = data[0]; // First field is the type (e.g., "COMMENT" or "RATING")
-                String feedbackID = data[1];
                 String attendeeID = data[2];
 
                 if ("COMMENT".equals(type)) {
                     String comment = data[4];
-                    feedbackList.add(new CommentFeedback(feedbackID, attendeeID, comment));
+                    feedbackList.add(new CommentFeedback(attendeeID, comment));
                 } else if ("RATING".equals(type)) {
                     int rating = Integer.parseInt(data[4]);
-                    feedbackList.add(new RatingFeedback(feedbackID, attendeeID, rating));
+                    feedbackList.add(new RatingFeedback(attendeeID, rating));
                 }
             }
         } catch (IOException e) {

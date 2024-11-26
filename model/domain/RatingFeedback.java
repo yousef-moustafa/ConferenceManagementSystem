@@ -4,8 +4,11 @@ public class RatingFeedback extends Feedback {
     private final int rating;
     private final int maxRating = 5; // Default maximum rating
 
-    public RatingFeedback(String feedbackID, String attendeeID, int rating) {
-        super(feedbackID, attendeeID);
+    public RatingFeedback(String attendeeID, int rating) {
+        super(attendeeID);
+        if (rating < 1 || rating > maxRating) {
+            throw new IllegalArgumentException("Rating must be between 1 and " + maxRating + ".");
+        }
         this.rating = rating;
     }
 

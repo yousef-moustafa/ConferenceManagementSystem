@@ -4,14 +4,22 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public abstract class Feedback {
+    private static int idCounter = 1; // Static counter for unique IDs
+
     private final String feedbackID;
     private final String attendeeID;
     private final LocalDateTime timestamp;
 
-    public Feedback(String feedbackID, String attendeeID) {
-        this.feedbackID = feedbackID;
+    // Constructor
+    public Feedback(String attendeeID) {
+        this.feedbackID = generateFeedbackID();
         this.attendeeID = attendeeID;
         this.timestamp = LocalDateTime.now();
+    }
+
+    // Generate Unique ID
+    private String generateFeedbackID() {
+        return "FEEDBACK-" + idCounter++;
     }
 
     // Getters
