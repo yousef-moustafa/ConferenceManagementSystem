@@ -22,8 +22,8 @@ public class AttendeeService {
     }
 
     // Create a new attendee
-    public String createAttendee(AttendeeDTO attendeeDTO) {
-        Attendee attendee = DTOMapper.mapDTOToAttendee(attendeeDTO);
+    public String createAttendee(AttendeeDTO attendeeDTO, String password) {
+        Attendee attendee = DTOMapper.mapDTOToAttendee(attendeeDTO, password);
 
         // Create a personalized schedule for the attendee
         String scheduleID = "SCHEDULE-" + (schedules.size() + 1);

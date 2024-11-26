@@ -23,8 +23,8 @@ public class SpeakerService {
     }
 
     // Create a new speaker
-    public String createSpeaker(SpeakerDTO speakerDTO) {
-        Speaker speaker = DTOMapper.mapDTOToSpeaker(speakerDTO);
+    public String createSpeaker(SpeakerDTO speakerDTO, String password) {
+        Speaker speaker = DTOMapper.mapDTOToSpeaker(speakerDTO, password);
         userRepository.save(speaker);
         return speaker.getUserID(); // Return the generated ID for the speaker
     }
