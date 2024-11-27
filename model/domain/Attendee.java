@@ -11,8 +11,8 @@ public class Attendee extends User {
     private String certificateID;
     private String feedbackID;
 
-    public Attendee(String userID, String userName, String email, String password, LocalDate registrationDate, List<String> registeredSessionIDs, String personalizedScheduleID, String certificateID, String feedbackID) {
-        super(userID, userName, email, password, registrationDate, UserRole.ATTENDEE);
+    public Attendee(String userName, String email, String password, LocalDate registrationDate, List<String> registeredSessionIDs, String personalizedScheduleID, String certificateID, String feedbackID) {
+        super(userName, email, password, registrationDate, UserRole.ATTENDEE);
         this.registeredSessionIDs = registeredSessionIDs;
         this.personalizedScheduleID = personalizedScheduleID;
         this.certificateID = certificateID;

@@ -22,7 +22,6 @@ public class UserRepository implements Repository<User> {
         String managerEmail = "manager@gaf.ac";
         if (findByEmail(managerEmail) == null) {
             User manager = new User(
-                    "MANAGER001",
                     "Nancy",
                     managerEmail,
                     "password123",
@@ -73,16 +72,21 @@ public class UserRepository implements Repository<User> {
                 LocalDate registrationDate = LocalDate.parse(data[4]);
                 UserRole role = UserRole.valueOf(data[5].toUpperCase());
 
+                User user;
                 if (role == UserRole.SPEAKER) {
                     String bio = data[6];
                     List<String> associatedSessionIDs = Arrays.asList(data[7].split(" ")); // Space-separated session IDs
-                    users.add(new Speaker(userID, userName, email, password, registrationDate, bio, associatedSessionIDs));
+                    user = new Speaker(userName, email, password, registrationDate, bio, associatedSessionIDs);
+                    user.setUserID(userID);
+                    users.add(user);
                 } else if (role == UserRole.ATTENDEE) {
                     List<String> registeredSessionIDs = Arrays.asList(data[6].split(" "));
                     String personalizedScheduleID = data[7];
                     String certificateID = data[8];
                     String feedbackID = data[9];
-                    users.add(new Attendee(userID, userName, email, password, registrationDate, registeredSessionIDs, personalizedScheduleID, certificateID, feedbackID));
+                    user = new Attendee(userName, email, password, registrationDate, registeredSessionIDs, personalizedScheduleID, certificateID, feedbackID);
+                    user.setUserID(userID);
+                    users.add(user);
                 }
             }
         } catch (IOException e) {

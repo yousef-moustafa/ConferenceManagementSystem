@@ -9,8 +9,8 @@ public class Speaker extends User {
     private String bio;
     private List<String> associatedSessionIDs;
 
-    public Speaker(String userID, String userName, String email, String password, LocalDate registrationDate, String bio, List<String> associatedSessionIDs) {
-        super(userID, userName, email, password, registrationDate, UserRole.SPEAKER);
+    public Speaker(String userName, String email, String password, LocalDate registrationDate, String bio, List<String> associatedSessionIDs) {
+        super(userName, email, password, registrationDate, UserRole.SPEAKER);
         this.bio = bio;
         this.associatedSessionIDs = associatedSessionIDs;
     }

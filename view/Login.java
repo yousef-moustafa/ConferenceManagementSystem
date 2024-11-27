@@ -3,8 +3,10 @@ package view;
 import model.domain.User;
 import model.domain.enums.AuthResult;
 import model.domain.enums.UserRole;
+import model.service.AttendeeService;
 import model.service.AuthService;
 import model.repository.UserRepository;
+import model.service.SessionService;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -56,6 +58,21 @@ public class Login extends JFrame {
 
                 // Step 4: Handle authentication result
                 handleAuthResult(authResult, role);
+            }
+        });
+
+        // Action listener to Register button
+        registerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Create necessary services
+                SessionService sessionService = new SessionService();
+                AttendeeService attendeeService = new AttendeeService(sessionService);
+
+                JFrame register = new AttendeeRegistrationUI(attendeeService);
+                register.setVisible(true);
+                register.setLocationRelativeTo(null);
+                Login.this.dispose();
             }
         });
 

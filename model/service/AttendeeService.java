@@ -22,7 +22,12 @@ public class AttendeeService {
     }
 
     // Create a new attendee
-    public String createAttendee(AttendeeDTO attendeeDTO, String password) {
+    public String createAttendee(AttendeeDTO attendeeDTO, String password) throws Exception {
+        // Check for duplicate email
+        if (userRepository.findByEmail(attendeeDTO.getEmail()) != null) {
+            throw new Exception("Email is already registered.");
+        }
+
         Attendee attendee = DTOMapper.mapDTOToAttendee(attendeeDTO, password);
 
         // Create a personalized schedule for the attendee

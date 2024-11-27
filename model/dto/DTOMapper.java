@@ -66,7 +66,6 @@ public class DTOMapper {
         }
 
         return new Attendee(
-                null,
                 dto.getName(),
                 dto.getEmail(),
                 password,
@@ -98,7 +97,6 @@ public class DTOMapper {
         }
 
         return new Speaker(
-                null,
                 dto.getName(),
                 dto.getEmail(),
                 password,

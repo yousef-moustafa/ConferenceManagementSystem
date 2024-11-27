@@ -2,7 +2,7 @@ package model.domain;
 
 import model.domain.enums.UserRole;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.UUID;
 
 public class User {
     private String userID;
@@ -12,13 +12,18 @@ public class User {
     private LocalDate registrationDate;
     private UserRole userRole;
 
-    public User(String userID, String userName, String email, String password, LocalDate registrationDate, UserRole userRole) {
-        this.userID = userID;
+    public User(String userName, String email, String password, LocalDate registrationDate, UserRole userRole) {
+        this.userID = generateUniqueID();
         this.userName = userName;
         this.email = email;
         this.password = password;
         this.registrationDate = registrationDate;
         this.userRole = userRole;
+    }
+
+    // ID Generator
+    private String generateUniqueID() {
+        return UUID.randomUUID().toString();
     }
 
     // Getters for all attributes
@@ -43,6 +48,10 @@ public class User {
     }
 
     // Setters needed
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
+
     public void setUserName(String userName) {
         this.userName = userName;
     }

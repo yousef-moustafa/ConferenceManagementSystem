@@ -25,7 +25,7 @@
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
-          <text value="Username or Email: "/>
+          <text value="Email: "/>
         </properties>
       </component>
       <component id="9ad87" class="javax.swing.JTextField" binding="textField1" default-binding="true">
