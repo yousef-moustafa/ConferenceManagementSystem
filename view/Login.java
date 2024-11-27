@@ -7,6 +7,9 @@ public class Login extends JFrame {
     private JPasswordField passwordField1;
     private JLabel errorMessage;
     private JPanel Login;
+    private JRadioButton adminRadioButton;
+    private JRadioButton attendeeRadioButton;
+    private JRadioButton speakerRadioButton;
 
     public Login() {
         setContentPane(Login);
@@ -18,5 +21,6 @@ public class Login extends JFrame {
 
     public static void main(String[] args) {
         Login login = new Login();
+        login.setLocationRelativeTo(null);
     }
 }
