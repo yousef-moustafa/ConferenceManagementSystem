@@ -1,6 +1,14 @@
 package view;
 
+import model.domain.User;
+import model.domain.enums.AuthResult;
+import model.domain.enums.UserRole;
+import model.service.AuthService;
+import model.repository.UserRepository;
+
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class Login extends JFrame {
     private JTextField textField1;
@@ -10,13 +18,93 @@ public class Login extends JFrame {
     private JRadioButton adminRadioButton;
     private JRadioButton attendeeRadioButton;
     private JRadioButton speakerRadioButton;
+    private JButton loginButton;
+
+    private final AuthService authService;
 
     public Login() {
+
+        // Initialize authService with a UserRepository
+        UserRepository userRepository = new UserRepository();
+        this.authService = new AuthService(userRepository);
+
+        // Setup UI
         setContentPane(Login);
         setTitle("Conference Management System Login");
         setSize(450,300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
+
+        // ActionListener to Login button
+        loginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Step 1: Capture user input
+                String email = textField1.getText();
+                String password = new String(passwordField1.getPassword());
+                UserRole role = getSelectedRole();
+
+                // Step 2: Validate input
+                if (email.isEmpty() || password.isEmpty() || role == null) {
+                    errorMessage.setText("Please fill in all fields and select a role.");
+                    return;
+                }
+
+                // Step 3: Authenticate user
+                AuthResult authResult = authService.login(email, password);
+
+                // Step 4: Handle authentication result
+                handleAuthResult(authResult, role);
+            }
+        });
+
+    }
+
+    private UserRole getSelectedRole() {
+        if (adminRadioButton.isSelected()) return UserRole.MANAGER;
+        if (attendeeRadioButton.isSelected()) return UserRole.ATTENDEE;
+        if (speakerRadioButton.isSelected()) return UserRole.SPEAKER;
+        return null; // No role selected
+    }
+
+    private void handleAuthResult(AuthResult result, UserRole role) {
+        if (result == AuthResult.SUCCESS) {
+            User currentUser = authService.getCurrentUser();
+            if (currentUser.getUserRole() != role) {
+                JOptionPane.showMessageDialog(this, "Role mismatch. Please select the correct role.");
+                return;
+            }
+
+            // Navigate to the correct dashboard
+            navigateToDashboard(role);
+        } else {
+            String errorMessage = switch (result) {
+                case USER_NOT_FOUND -> "User not found.";
+                case INVALID_CREDENTIALS -> "Invalid credentials. Please try again.";
+                default -> "System error. Please contact support.";
+            };
+            JOptionPane.showMessageDialog(this, errorMessage);
+        }
+    }
+
+    private void navigateToDashboard(UserRole role) {
+        JFrame dashboard;
+        switch (role) {
+            case MANAGER:
+                dashboard = new ManagerPortalUI();
+                break;
+            case SPEAKER:
+                dashboard = new SpeakerPortalUI();
+                break;
+            case ATTENDEE:
+                dashboard = new AttendeePortalUI();
+                break;
+            default:
+                JOptionPane.showMessageDialog(this, "Unknown role.");
+                return;
+        }
+        dashboard.setVisible(true);
+        this.dispose(); // Close the login window
     }
 
     public static void main(String[] args) {

@@ -15,7 +15,7 @@
       </hspacer>
       <vspacer id="55f3a">
         <constraints>
-          <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="1" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="1" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
       </vspacer>
@@ -61,11 +61,11 @@
       </component>
       <component id="6b59b" class="javax.swing.JLabel" binding="errorMessage">
         <constraints>
-          <grid row="9" column="5" row-span="1" col-span="7" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="10" column="5" row-span="1" col-span="7" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
-          <enabled value="false"/>
+          <enabled value="true"/>
           <foreground color="-1755635"/>
           <text value=" "/>
         </properties>
@@ -145,7 +145,7 @@
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
       </vspacer>
-      <component id="21bec" class="javax.swing.JButton" default-binding="true">
+      <component id="21bec" class="javax.swing.JButton" binding="loginButton">
         <constraints>
           <grid row="8" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.0" weighty="0.0"/>
@@ -154,6 +154,12 @@
           <text value="Login"/>
         </properties>
       </component>
+      <hspacer id="22eb1">
+        <constraints>
+          <grid row="9" column="7" row-span="1" col-span="2" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="0.0" weighty="0.0"/>
+        </constraints>
+      </hspacer>
     </children>
   </grid>
   <buttonGroups>
