@@ -17,6 +17,20 @@ public class UserRepository implements Repository<User> {
 
     public UserRepository() {
         loadFromFile();
+
+        // Add a pre-established Manager account
+        String managerEmail = "manager@gaf.ac";
+        if (findByEmail(managerEmail) == null) {
+            User manager = new User(
+                    "MANAGER001",
+                    "Nancy",
+                    managerEmail,
+                    "password123",
+                    LocalDate.now(),
+                    UserRole.MANAGER
+            );
+            save(manager); // Save the Manager account to the repository
+        }
     }
 
     @Override

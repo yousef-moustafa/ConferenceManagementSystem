@@ -19,6 +19,7 @@ public class Login extends JFrame {
     private JRadioButton attendeeRadioButton;
     private JRadioButton speakerRadioButton;
     private JButton loginButton;
+    private JButton registerButton;
 
     private final AuthService authService;
 
@@ -57,6 +58,20 @@ public class Login extends JFrame {
                 handleAuthResult(authResult, role);
             }
         });
+
+        // Add a ChangeListener to the ButtonGroup
+        ActionListener buttonGroupListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Enable the Register button only if attendeeRadioButton is selected
+                registerButton.setEnabled(attendeeRadioButton.isSelected());
+            }
+        };
+
+        // Attach the same ActionListener to all radio buttons
+        adminRadioButton.addActionListener(buttonGroupListener);
+        attendeeRadioButton.addActionListener(buttonGroupListener);
+        speakerRadioButton.addActionListener(buttonGroupListener);
 
     }
 
@@ -104,6 +119,7 @@ public class Login extends JFrame {
                 return;
         }
         dashboard.setVisible(true);
+        dashboard.setLocationRelativeTo(null);
         this.dispose(); // Close the login window
     }
 
