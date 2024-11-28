@@ -34,6 +34,9 @@ public class UserRepository implements Repository<User> {
 
     @Override
     public void save(User entity) {
+        // Remove existing user with the same ID
+        users.removeIf(user -> user.getUserID().equals(entity.getUserID()));
+
         users.add(entity);
         writeToFile();
     }
@@ -75,7 +78,10 @@ public class UserRepository implements Repository<User> {
                 User user;
                 if (role == UserRole.SPEAKER) {
                     String bio = data[6];
-                    List<String> associatedSessionIDs = Arrays.asList(data[7].split(" ")); // Space-separated session IDs
+                    List<String> associatedSessionIDs = new ArrayList<>();
+                    if (data.length > 7 && !data[7].isBlank()) {
+                        associatedSessionIDs = Arrays.asList(data[7].split(" "));
+                    }
                     user = new Speaker(userName, email, password, registrationDate, bio, associatedSessionIDs);
                     user.setUserID(userID);
                     users.add(user);

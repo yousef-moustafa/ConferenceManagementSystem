@@ -2,6 +2,7 @@ package model.service;
 
 import model.domain.Speaker;
 import model.domain.Session;
+import model.domain.User;
 import model.dto.SpeakerDTO;
 import model.dto.SessionDTO;
 import model.dto.DTOMapper;
@@ -35,6 +36,16 @@ public class SpeakerService {
         if (speaker != null) {
             speaker.setBio(bio);
             userRepository.save(speaker);
+        }
+    }
+
+    // Delete a speaker by  ID
+    public void deleteSpeaker(String speakerID) {
+        Speaker speaker = (Speaker) userRepository.findById(speakerID);
+        if (speaker != null) {
+            userRepository.delete(speakerID);
+        } else {
+            throw new IllegalArgumentException("Speaker with ID " + speakerID + " not found.");
         }
     }
 
@@ -77,5 +88,21 @@ public class SpeakerService {
             session.setSpeakerID(speakerID);
             sessionRepository.save(session);
         }
+    }
+
+    // Retrieve all speakers as DTOs along with their IDs
+    public List<SpeakerDTO> getAllSpeakersWithIDs(List<String> speakerIDs) {
+        List<SpeakerDTO> speakerDTOs = new ArrayList<>();
+        for (User user : userRepository.findAll()) {
+            if (user instanceof Speaker) {
+                Speaker speaker = (Speaker) user;
+                // Add the ID to the external ID list
+                speakerIDs.add(speaker.getUserID());
+
+                // Map the Speaker domain object to SpeakerDTO
+                speakerDTOs.add(DTOMapper.mapSpeakerToDTO(speaker));
+            }
+        }
+        return speakerDTOs;
     }
 }

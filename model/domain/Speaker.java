@@ -25,7 +25,11 @@ public class Speaker extends User {
 
     @Override
     public String toString() {
-        return super.toString() + ", " + bio + ", " + String.join(" ", associatedSessionIDs);
+        String sessionIDs = "";
+        if (!associatedSessionIDs.isEmpty()) {
+            sessionIDs = String.join(" ", associatedSessionIDs);
+        }
+        return super.toString() + ", " + bio + ", " + sessionIDs;
     }
 
     public List<String> getAssociatedSessionIDs() {
