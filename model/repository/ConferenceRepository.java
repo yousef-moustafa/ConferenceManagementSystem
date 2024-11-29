@@ -50,17 +50,17 @@ public class ConferenceRepository implements Repository<Conference> {
             String line = reader.readLine();
             if (line != null) {
                 String[] data = line.split(", ");
-                if (data.length >= 3) {
+                if (data.length >= 4) {
                     Conference loadedConference = new Conference();
-                    loadedConference.setConferenceName(data[0]);
-                    loadedConference.setStartDate(dateFormat.parse(data[1]));
-                    loadedConference.setEndDate(dateFormat.parse(data[2]));
+                    loadedConference.setConferenceID(data[0]);
+                    loadedConference.setConferenceName(data[1]);
+                    loadedConference.setStartDate(dateFormat.parse(data[2]));
+                    loadedConference.setEndDate(dateFormat.parse(data[3]));
                     conference = loadedConference;
                 }
             }
         } catch (IOException | ParseException e) {
-            // Handle missing or corrupted file gracefully
-            conference = null; // No conference found
+            conference = null;
         }
     }
 

@@ -2,12 +2,14 @@ package model.dto;
 import java.util.List;
 
 public class AttendeeDTO {
+    private String attendeeID;
     private String name;
     private String email;
     private List<String> registeredSessionIDs; // For viewing or managing registered sessions
 
     public AttendeeDTO() {}
 
+    // Constructor without ID
     public AttendeeDTO(String name, String email, List<String> registeredSessionIDs) {
         this.name = name;
         this.email = email;
@@ -15,6 +17,8 @@ public class AttendeeDTO {
     }
 
     // Getters and setters
+    public String getAttendeeID() { return attendeeID; }
+
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 

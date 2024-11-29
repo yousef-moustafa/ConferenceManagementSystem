@@ -73,6 +73,8 @@ public class Session {
     }
 
     // Setters
+    public void setSessionID(String sessionID) { this.sessionID = sessionID; }
+
     public void setSessionName(String sessionName) {
         this.sessionName = sessionName;
     }
@@ -103,18 +105,17 @@ public class Session {
 
     @Override
     public String toString() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Formatting Date
-        DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm"); // Formatting LocalTime
-
-        // Format date and time, and include attendee count
-        return sessionName + ", "
-                + speakerID + ", "
-                + dateFormat.format(date) + ", "
-                + time.format(timeFormat) + ", "
-                + room + ", "
-                + status + ", "
-                + capacity + ", "
-                + "Attendees: " + attendeeIDs.size();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return String.join(", ",
+                sessionID,
+                sessionName,
+                speakerID,
+                dateFormat.format(date),
+                time.toString(),
+                room,
+                String.valueOf(capacity),
+                status.toString()
+        );
     }
 
 }

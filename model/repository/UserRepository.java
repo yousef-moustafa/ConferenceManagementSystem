@@ -71,7 +71,7 @@ public class UserRepository implements Repository<User> {
                 String userID = data[0];
                 String userName = data[1];
                 String email = data[2];
-                String password = data[3]; // Add password parsing
+                String password = data[3];
                 LocalDate registrationDate = LocalDate.parse(data[4]);
                 UserRole role = UserRole.valueOf(data[5].toUpperCase());
 

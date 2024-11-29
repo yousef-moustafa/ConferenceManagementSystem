@@ -29,6 +29,7 @@ public class SessionDTO {
 
     // Getters and setters
     public String getSessionID() { return sessionID; }
+    public void setSessionID(String sessionID) { this.sessionID = sessionID; }
 
     public String getSessionName() { return sessionName; }
     public void setSessionName(String sessionName) { this.sessionName = sessionName; }

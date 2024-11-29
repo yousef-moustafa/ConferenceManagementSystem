@@ -37,6 +37,7 @@ public class Login extends JFrame {
         setSize(450,300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
+        setLocationRelativeTo(null);
 
         // ActionListener to Login button
         loginButton.addActionListener(new ActionListener() {

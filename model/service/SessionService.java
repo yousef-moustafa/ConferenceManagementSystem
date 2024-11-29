@@ -18,9 +18,10 @@ public class SessionService {
     }
 
     // Create a new session
-    public void createSession(SessionDTO sessionDTO) {
+    public String createSession(SessionDTO sessionDTO) {
         Session session = DTOMapper.mapDTOToSession(sessionDTO);
         sessionRepository.save(session);
+        return session.getSessionID();
     }
 
     // Update an existing session

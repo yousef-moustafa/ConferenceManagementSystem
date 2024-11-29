@@ -30,11 +30,16 @@ public class SpeakerService {
         return speaker.getUserID(); // Return the generated ID for the speaker
     }
 
-    // Update a speaker's bio
-    public void updateSpeakerBio(String speakerID, String bio) {
+    // Update a speaker's profile
+    public void updateSpeakerProfile(String speakerID, String name, String bio) {
         Speaker speaker = (Speaker) userRepository.findById(speakerID);
         if (speaker != null) {
-            speaker.setBio(bio);
+            if (speaker.getUserName() != null) {
+                speaker.setUserName(name);
+            }
+            if (speaker.getBio() != null) {
+                speaker.setBio(bio);
+            }
             userRepository.save(speaker);
         }
     }
@@ -91,18 +96,17 @@ public class SpeakerService {
     }
 
     // Retrieve all speakers as DTOs along with their IDs
-    public List<SpeakerDTO> getAllSpeakersWithIDs(List<String> speakerIDs) {
-        List<SpeakerDTO> speakerDTOs = new ArrayList<>();
-        for (User user : userRepository.findAll()) {
+    public List<SpeakerDTO> getAllSpeakers() {
+        List<User> users = userRepository.findAll();
+        List<SpeakerDTO> speakers = new ArrayList<>();
+
+        for (User user : users) {
             if (user instanceof Speaker) {
                 Speaker speaker = (Speaker) user;
-                // Add the ID to the external ID list
-                speakerIDs.add(speaker.getUserID());
-
-                // Map the Speaker domain object to SpeakerDTO
-                speakerDTOs.add(DTOMapper.mapSpeakerToDTO(speaker));
+                speakers.add(DTOMapper.mapSpeakerToDTO(speaker));
             }
         }
-        return speakerDTOs;
+
+        return speakers;
     }
 }

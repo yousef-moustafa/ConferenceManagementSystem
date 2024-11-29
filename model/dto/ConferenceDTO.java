@@ -2,19 +2,23 @@ package model.dto;
 import java.util.Date;
 
 public class ConferenceDTO {
+    private String conferenceID;
     private String conferenceName;
     private Date startDate;
     private Date endDate;
 
     public ConferenceDTO() {}
 
-    public ConferenceDTO(String conferenceName, Date startDate, Date endDate) {
+    public ConferenceDTO(String conferenceID, String conferenceName, Date startDate, Date endDate) {
+        this.conferenceID = conferenceID;
         this.conferenceName = conferenceName;
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
     // Getters and setters
+    public String getConferenceID() { return conferenceID; }
+
     public String getConferenceName() { return conferenceName; }
     public void setConferenceName(String conferenceName) { this.conferenceName = conferenceName; }
 

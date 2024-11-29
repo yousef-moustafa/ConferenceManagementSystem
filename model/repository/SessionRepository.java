@@ -50,27 +50,23 @@ public class SessionRepository implements Repository<Session> {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                // Split line by comma
                 String[] data = line.split(", ");
-
                 if (data.length == 8) {
                     Session session = new Session();
 
-                    // Directly set the values using setter methods
-                    session.setSessionName(data[0]);
-                    session.setSpeakerID(data[1]);
-                    session.setDate(new SimpleDateFormat("yyyy-MM-dd").parse(data[2]));
-                    session.setTime(LocalTime.parse(data[3]));
-                    session.setRoom(data[4]);
-                    session.setStatus(SessionStatus.valueOf(data[5].toUpperCase()));
+                    session.setSessionID(data[0]);
+                    session.setSessionName(data[1]);
+                    session.setSpeakerID(data[2]);
+                    session.setDate(new SimpleDateFormat("yyyy-MM-dd").parse(data[3]));
+                    session.setTime(LocalTime.parse(data[4]));
+                    session.setRoom(data[5]);
                     session.setCapacity(Integer.parseInt(data[6]));
-
-                    // Add the session to the list
+                    session.setStatus(SessionStatus.valueOf(data[7].toUpperCase()));
                     sessions.add(session);
                 }
             }
         } catch (IOException | ParseException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error loading sessions from file: " + e.getMessage(), e);
         }
     }
 

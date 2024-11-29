@@ -59,13 +59,12 @@ public class DTOMapper {
         );
     }
 
-
-    public static Attendee mapDTOToAttendee(AttendeeDTO dto, String password) { // Added password parameter
+    public static Attendee mapDTOToAttendee(AttendeeDTO dto, String password) {
         if (dto == null) {
             return null;
         }
 
-        return new Attendee(
+        Attendee attendee = new Attendee(
                 dto.getName(),
                 dto.getEmail(),
                 password,
@@ -75,6 +74,7 @@ public class DTOMapper {
                 null,
                 null
         );
+        return attendee;
     }
 
     // Speaker mappings
@@ -84,6 +84,7 @@ public class DTOMapper {
         }
 
         return new SpeakerDTO(
+                speaker.getUserID(),
                 speaker.getUserName(),
                 speaker.getEmail(),
                 speaker.getBio(),
@@ -91,12 +92,12 @@ public class DTOMapper {
         );
     }
 
-    public static Speaker mapDTOToSpeaker(SpeakerDTO dto, String password) { // Added password parameter
+    public static Speaker mapDTOToSpeaker(SpeakerDTO dto, String password) {
         if (dto == null) {
             return null;
         }
 
-        return new Speaker(
+        Speaker speaker = new Speaker(
                 dto.getName(),
                 dto.getEmail(),
                 password,
@@ -104,7 +105,9 @@ public class DTOMapper {
                 dto.getBio(),
                 dto.getAssociatedSessionIDs()
         );
+        return speaker;
     }
+
     // Conference mappings
     public static ConferenceDTO mapConferenceToDTO(Conference conference) {
         if (conference == null) {
@@ -112,6 +115,7 @@ public class DTOMapper {
         }
 
         return new ConferenceDTO(
+                conference.getConferenceID(),
                 conference.getConferenceName(),
                 conference.getStartDate(),
                 conference.getEndDate()
@@ -127,8 +131,10 @@ public class DTOMapper {
         conference.setConferenceName(dto.getConferenceName());
         conference.setStartDate(dto.getStartDate());
         conference.setEndDate(dto.getEndDate());
+        conference.setConferenceID(dto.getConferenceID()); // Explicitly set the ID
         return conference;
     }
+
 
     // Certificate mapping
     public static CertificateDTO mapCertificateToDTO(Certificate certificate) {
@@ -137,6 +143,7 @@ public class DTOMapper {
         }
 
         return new CertificateDTO(
+                certificate.getCertificateID(),
                 certificate.getAttendeeID(),
                 certificate.getConferenceName(),
                 certificate.getIssueDate()

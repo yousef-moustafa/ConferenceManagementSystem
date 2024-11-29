@@ -35,6 +35,8 @@ public class Conference {
     public List<String> getSessionIDs() { return sessionIDs; }
 
     // Setters
+    public void setConferenceID(String conferenceID) { this.conferenceID = conferenceID; }
+
     public void setConferenceName(String conferenceName) {
         this.conferenceName = conferenceName;
     }
