@@ -1,8 +1,10 @@
 package view;
 
 import model.domain.enums.SessionStatus;
+import model.dto.AttendeeDTO;
 import model.dto.SessionDTO;
 import model.dto.SpeakerDTO;
+import model.service.AttendeeService;
 import model.service.SessionService;
 import model.service.SpeakerService;
 
@@ -25,12 +27,14 @@ public class ManagerPortalUI extends JFrame {
     private JButton addSessionButton;
     private JButton editSessionButton;
     private JButton deleteSessionButton;
-    private JTable table3;
-    private JTextField textField1;
+    private JTable attendeeTable;
+    private JTextField searchField;
     private JButton searchButton;
-    private JButton generateAttendanceReportButton;
+    private JButton markAttendanceButton;
     private JTable table4;
     private JButton exportFeedbackReportButton;
+    private JComboBox comboBox1;
+    private JTable table1;
 
     public ManagerPortalUI() {
         setContentPane(ManagerPortalUI);
@@ -59,11 +63,24 @@ public class ManagerPortalUI extends JFrame {
         sessionTable.getColumnModel().getColumn(0).setMaxWidth(0);
         sessionTable.getColumnModel().getColumn(0).setPreferredWidth(0);
 
+        DefaultTableModel attendeeTableModel = new DefaultTableModel(
+                new String[]{"ID", "Name", "Email", "Registered Sessions"}, 0
+        );
+        attendeeTable.setModel(attendeeTableModel);
+
+        // Hide the ID column in the attendee table
+        attendeeTable.getColumnModel().getColumn(0).setMinWidth(0);
+        attendeeTable.getColumnModel().getColumn(0).setMaxWidth(0);
+        attendeeTable.getColumnModel().getColumn(0).setPreferredWidth(0);
+
+
         SpeakerService speakerService = new SpeakerService();
         SessionService sessionService = new SessionService();
+        AttendeeService attendeeService = new AttendeeService(sessionService);
 
         loadSpeakers(speakerTableModel, speakerService);
         loadSessions(sessionTableModel, sessionService, speakerService);
+        loadAttendees(attendeeTableModel, attendeeService);
 
         addSpeakerButton.addActionListener(e -> addSpeaker(speakerTableModel, speakerService));
         editSpeakerButton.addActionListener(e -> editSpeaker(speakerTableModel, speakerService));
@@ -72,6 +89,11 @@ public class ManagerPortalUI extends JFrame {
         addSessionButton.addActionListener(e -> addSession(sessionTableModel, sessionService, speakerService));
         editSessionButton.addActionListener(e -> editSession(sessionTableModel, sessionService, speakerService));
         deleteSessionButton.addActionListener(e -> deleteSession(sessionTableModel, sessionService, speakerService));
+
+        searchButton.addActionListener(e -> {
+            if (searchField.getText().trim().isEmpty()) loadAttendees(attendeeTableModel, attendeeService);
+            else searchAttendees(attendeeTableModel, attendeeService, searchField.getText().trim());
+        });
     }
 
     private void loadSpeakers(DefaultTableModel speakerTableModel, SpeakerService speakerService) {
@@ -112,6 +134,20 @@ public class ManagerPortalUI extends JFrame {
                     session.getRoom(),
                     session.getCapacity(),
                     session.getStatus().toString()
+            });
+        }
+    }
+
+    private void loadAttendees(DefaultTableModel attendeeTableModel, AttendeeService attendeeService) {
+        attendeeTableModel.setRowCount(0);
+
+        List<AttendeeDTO> attendees = attendeeService.getAllAttendees();
+        for (AttendeeDTO attendee : attendees) {
+            attendeeTableModel.addRow(new Object[]{
+                    attendee.getAttendeeID(),
+                    attendee.getName(),
+                    attendee.getEmail(),
+                    String.join(", ", attendee.getRegisteredSessionIDs())
             });
         }
     }
@@ -413,6 +449,20 @@ public class ManagerPortalUI extends JFrame {
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, "Failed to delete session: " + ex.getMessage());
             }
+        }
+    }
+
+    private void searchAttendees(DefaultTableModel attendeeTableModel, AttendeeService attendeeService, String query) {
+        attendeeTableModel.setRowCount(0);
+
+        List<AttendeeDTO> filteredAttendees = attendeeService.searchAttendees(query);
+        for (AttendeeDTO attendee : filteredAttendees) {
+            attendeeTableModel.addRow(new Object[]{
+                    attendee.getAttendeeID(),
+                    attendee.getName(),
+                    attendee.getEmail(),
+                    String.join(", ", attendee.getRegisteredSessionIDs())
+            });
         }
     }
 }

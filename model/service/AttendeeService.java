@@ -2,6 +2,7 @@ package model.service;
 
 import model.domain.Attendee;
 import model.domain.PersonalizedSchedule;
+import model.domain.User;
 import model.dto.AttendeeDTO;
 import model.dto.DTOMapper;
 import model.repository.UserRepository;
@@ -9,6 +10,7 @@ import model.service.SessionService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AttendeeService {
     private final UserRepository userRepository;
@@ -86,5 +88,27 @@ public class AttendeeService {
             }
         }
         return false; // Registration failed
+    }
+
+    // Get all attendees
+    public List<AttendeeDTO> getAllAttendees() {
+        List<User> users = userRepository.findAll();
+        List<AttendeeDTO> attendees = new ArrayList<>();
+
+        for (User user : users) {
+            if (user instanceof Attendee) {
+                Attendee attendee = (Attendee) user;
+                attendees.add(DTOMapper.mapAttendeeToDTO(attendee));
+            }
+        }
+        return attendees;
+    }
+
+    // Query attendee by name or email
+    public List<AttendeeDTO> searchAttendees(String query) {
+        return getAllAttendees().stream()
+                .filter(attendee -> attendee.getName().toLowerCase().contains(query.toLowerCase()) ||
+                        attendee.getEmail().toLowerCase().contains(query.toLowerCase()))
+                .collect(Collectors.toList());
     }
 }
