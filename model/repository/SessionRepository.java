@@ -21,6 +21,9 @@ public class SessionRepository implements Repository<Session> {
 
     @Override
     public void save(Session entity) {
+        // Remove existing user with the same ID
+        sessions.removeIf(session -> session.getSessionID().equals(entity.getSessionID()));
+
         sessions.add(entity);
         writeToFile(); // Write to file after adding
     }

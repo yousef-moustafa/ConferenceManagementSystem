@@ -9,6 +9,7 @@ import model.service.SpeakerService;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,10 +44,20 @@ public class ManagerPortalUI extends JFrame {
         );
         speakerTable.setModel(speakerTableModel);
 
+        // Hide the ID column in the speaker table
+        speakerTable.getColumnModel().getColumn(0).setMinWidth(0);
+        speakerTable.getColumnModel().getColumn(0).setMaxWidth(0);
+        speakerTable.getColumnModel().getColumn(0).setPreferredWidth(0);
+
         DefaultTableModel sessionTableModel = new DefaultTableModel(
                 new String[]{"ID", "Title", "Speaker", "Date", "Time", "Room", "Capacity", "Status"}, 0
         );
         sessionTable.setModel(sessionTableModel);
+
+        // Hide the ID column in the session table
+        sessionTable.getColumnModel().getColumn(0).setMinWidth(0);
+        sessionTable.getColumnModel().getColumn(0).setMaxWidth(0);
+        sessionTable.getColumnModel().getColumn(0).setPreferredWidth(0);
 
         SpeakerService speakerService = new SpeakerService();
         SessionService sessionService = new SessionService();
@@ -59,6 +70,8 @@ public class ManagerPortalUI extends JFrame {
         deleteSpeakerButton.addActionListener(e -> deleteSpeaker(speakerTableModel, speakerService));
 
         addSessionButton.addActionListener(e -> addSession(sessionTableModel, sessionService, speakerService));
+        editSessionButton.addActionListener(e -> editSession(sessionTableModel, sessionService, speakerService));
+        deleteSessionButton.addActionListener(e -> deleteSession(sessionTableModel, sessionService, speakerService));
     }
 
     private void loadSpeakers(DefaultTableModel speakerTableModel, SpeakerService speakerService) {
@@ -286,6 +299,120 @@ public class ManagerPortalUI extends JFrame {
         }
     }
 
+    private void editSession(DefaultTableModel sessionTableModel, SessionService sessionService, SpeakerService speakerService) {
+        int selectedRow = sessionTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(null, "Please select a session to edit.");
+            return;
+        }
 
+        String sessionID = sessionTableModel.getValueAt(selectedRow, 0).toString();
 
+        SessionDTO session = sessionService.getSession(sessionID);
+        if (session == null) {
+            JOptionPane.showMessageDialog(null, "Session not found.");
+            return;
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String formattedDate = dateFormat.format(session.getDate());
+
+        JTextField sessionNameField = new JTextField(session.getSessionName());
+        JTextField dateField = new JTextField(formattedDate); // Use formatted date
+        JTextField timeField = new JTextField(session.getTime().toString());
+        JTextField roomField = new JTextField(session.getRoom());
+        JTextField capacityField = new JTextField(String.valueOf(session.getCapacity()));
+
+        // Fetch speaker names and IDs
+        List<SpeakerDTO> speakers = speakerService.getAllSpeakers();
+        JComboBox<String> speakerComboBox = new JComboBox<>(speakers.stream()
+                .map(SpeakerDTO::getName)
+                .toArray(String[]::new));
+
+        // Set the selected speaker in the combo box
+        SpeakerDTO currentSpeaker = speakerService.getSpeakerProfile(session.getSpeakerID());
+        if (currentSpeaker != null) {
+            speakerComboBox.setSelectedItem(currentSpeaker.getName());
+        }
+
+        Object[] fields = {
+                "Session Name:", sessionNameField,
+                "Date (YYYY-MM-DD):", dateField,
+                "Time (HH:MM):", timeField,
+                "Room:", roomField,
+                "Capacity:", capacityField,
+                "Speaker:", speakerComboBox
+        };
+
+        int result = JOptionPane.showConfirmDialog(null, fields, "Edit Session", JOptionPane.OK_CANCEL_OPTION);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                String updatedName = sessionNameField.getText().trim();
+                Date updatedDate = Date.valueOf(dateField.getText().trim());
+                LocalTime updatedTime = LocalTime.parse(timeField.getText().trim());
+                String updatedRoom = roomField.getText().trim();
+                int updatedCapacity = Integer.parseInt(capacityField.getText().trim());
+                String updatedSpeakerName = (String) speakerComboBox.getSelectedItem();
+
+                // Find the updated speaker ID by matching the name
+                String updatedSpeakerID = null;
+                for (SpeakerDTO speaker : speakers) {
+                    if (speaker.getName().equals(updatedSpeakerName)) {
+                        updatedSpeakerID = speaker.getSpeakerID();
+                        break;
+                    }
+                }
+
+                if (updatedSpeakerID == null) {
+                    throw new Exception("Speaker not found.");
+                }
+
+                // Update the session DTO
+                session.setSessionName(updatedName);
+                session.setDate(updatedDate);
+                session.setTime(updatedTime);
+                session.setRoom(updatedRoom);
+                session.setCapacity(updatedCapacity);
+                session.setSpeakerID(updatedSpeakerID);
+
+                // Save the updated session
+                sessionService.updateSession(session);
+
+                // Reload sessions to update the table
+                loadSessions(sessionTableModel, sessionService, speakerService);
+
+                JOptionPane.showMessageDialog(null, "Session updated successfully!");
+            } catch (Exception ex) {
+                ex.printStackTrace(); // This will show the full stack trace in the console
+                JOptionPane.showMessageDialog(null, "Failed to update session: " + ex.getMessage());
+            }
+        }
+    }
+
+    private void deleteSession(DefaultTableModel sessionTableModel, SessionService sessionService, SpeakerService speakerService) {
+        int selectedRow = sessionTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(null, "Please select a session to delete.");
+            return;
+        }
+
+        String sessionID = sessionTableModel.getValueAt(selectedRow, 0).toString();
+
+        int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this session?",
+                "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+
+        if (result == JOptionPane.YES_OPTION) {
+            try {
+                sessionService.deleteSession(sessionID);
+
+                // Reload sessions to update the table
+                loadSessions(sessionTableModel, sessionService, speakerService);
+
+                JOptionPane.showMessageDialog(null, "Session deleted successfully!");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Failed to delete session: " + ex.getMessage());
+            }
+        }
+    }
 }

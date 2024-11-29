@@ -19,7 +19,6 @@ public class Session {
     private int capacity;
     private SessionStatus status;
 
-    private static int idCounter = 1;
 
     public Session() {
         this.sessionID = generateSessionID();
@@ -28,7 +27,7 @@ public class Session {
 
     // Generate Unique ID
     private String generateSessionID() {
-        return "SESSION-" + idCounter++;
+        return UUID.randomUUID().toString();
     }
 
     // Getters
