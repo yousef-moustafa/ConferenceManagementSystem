@@ -33,8 +33,8 @@ public class ManagerPortalUI extends JFrame {
     private JButton markAttendanceButton;
     private JTable table4;
     private JButton exportFeedbackReportButton;
-    private JComboBox comboBox1;
-    private JTable table1;
+    private JComboBox sessionComboBox;
+    private JTable sessionAttendeesTable;
 
     public ManagerPortalUI() {
         setContentPane(ManagerPortalUI);
@@ -73,6 +73,10 @@ public class ManagerPortalUI extends JFrame {
         attendeeTable.getColumnModel().getColumn(0).setMaxWidth(0);
         attendeeTable.getColumnModel().getColumn(0).setPreferredWidth(0);
 
+        DefaultTableModel sessionAttendeesTableModel = new DefaultTableModel(
+                new String[]{"ID", "Name", "Email"}, 0
+        );
+        sessionAttendeesTable.setModel(sessionAttendeesTableModel);
 
         SpeakerService speakerService = new SpeakerService();
         SessionService sessionService = new SessionService();
@@ -81,6 +85,13 @@ public class ManagerPortalUI extends JFrame {
         loadSpeakers(speakerTableModel, speakerService);
         loadSessions(sessionTableModel, sessionService, speakerService);
         loadAttendees(attendeeTableModel, attendeeService);
+
+        // Load sessions into combo box when tab is switched to process registration
+        tabbedPane1.addChangeListener(e -> {
+            if (tabbedPane1.getSelectedIndex() == 1) {
+                loadSessionsIntoComboBox(sessionComboBox, sessionService);
+            }
+        });
 
         addSpeakerButton.addActionListener(e -> addSpeaker(speakerTableModel, speakerService));
         editSpeakerButton.addActionListener(e -> editSpeaker(speakerTableModel, speakerService));
@@ -93,6 +104,14 @@ public class ManagerPortalUI extends JFrame {
         searchButton.addActionListener(e -> {
             if (searchField.getText().trim().isEmpty()) loadAttendees(attendeeTableModel, attendeeService);
             else searchAttendees(attendeeTableModel, attendeeService, searchField.getText().trim());
+        });
+
+        sessionComboBox.addActionListener(e -> {
+            String selectedSession = (String) sessionComboBox.getSelectedItem();
+            if (selectedSession != null) {
+                String sessionID = selectedSession.split(":")[0]; // Extract session ID
+                loadAttendeesForSession(sessionAttendeesTableModel, sessionService, sessionID);
+            }
         });
     }
 
@@ -465,4 +484,27 @@ public class ManagerPortalUI extends JFrame {
             });
         }
     }
+
+    private void loadSessionsIntoComboBox(JComboBox<String> sessionComboBox, SessionService sessionService) {
+        sessionComboBox.removeAllItems();
+
+        List<SessionDTO> sessions = sessionService.getAllSessions(); // Fetch all sessions
+        for (SessionDTO session : sessions) {
+            sessionComboBox.addItem(session.getSessionID() + ": " + session.getSessionName());
+        }
+    }
+
+    private void loadAttendeesForSession(DefaultTableModel sessionAttendeesTableModel, SessionService sessionService, String sessionID) {
+        sessionAttendeesTableModel.setRowCount(0);
+
+        List<AttendeeDTO> attendees = sessionService.getSessionAttendees(sessionID);
+        for (AttendeeDTO attendee : attendees) {
+            sessionAttendeesTableModel.addRow(new Object[]{
+                    attendee.getAttendeeID(),
+                    attendee.getName(),
+                    attendee.getEmail()
+            });
+        }
+    }
+
 }

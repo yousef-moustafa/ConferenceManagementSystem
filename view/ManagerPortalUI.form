@@ -238,13 +238,13 @@
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <component id="de716" class="javax.swing.JTable" binding="table1" default-binding="true">
+                  <component id="de716" class="javax.swing.JTable" binding="sessionAttendeesTable">
                     <constraints/>
                     <properties/>
                   </component>
                 </children>
               </scrollpane>
-              <component id="a2d86" class="javax.swing.JComboBox" binding="comboBox1" default-binding="true">
+              <component id="a2d86" class="javax.swing.JComboBox" binding="sessionComboBox">
                 <constraints>
                   <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>

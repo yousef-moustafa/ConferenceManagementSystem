@@ -1,9 +1,11 @@
 package model.service;
 
 import model.domain.Session;
+import model.domain.Attendee;
 import model.dto.SessionDTO;
 import model.dto.AttendeeDTO;
 import model.repository.SessionRepository;
+import model.repository.UserRepository;
 import model.dto.DTOMapper;
 import model.domain.enums.SessionStatus;
 
@@ -12,9 +14,11 @@ import java.util.List;
 
 public class SessionService {
     private final SessionRepository sessionRepository;
+    private final UserRepository userRepository;
 
     public SessionService() {
         this.sessionRepository = new SessionRepository();
+        this.userRepository = new UserRepository();
     }
 
     // Create a new session
@@ -85,13 +89,15 @@ public class SessionService {
         Session session = sessionRepository.findById(sessionId);
         if (session != null) {
             List<AttendeeDTO> attendeeDTOs = new ArrayList<>();
-            // for (String attendeeId : session.getAttendeeIDs()) {
-                // Commented out until AttendeeService is implemented
-                // AttendeeDTO attendeeDTO = fetchAttendeeDetails(attendeeId);
-                // if (attendeeDTO != null) {
-                //     attendeeDTOs.add(attendeeDTO);
-                // }
-            // }
+
+            // Loop through each attendee ID in the session
+            for (String attendeeId : session.getAttendeeIDs()) {
+                Attendee attendee = (Attendee) userRepository.findById(attendeeId);
+                if (attendee != null) {
+                    attendeeDTOs.add(DTOMapper.mapAttendeeToDTO(attendee));
+                }
+            }
+
             return attendeeDTOs;
         }
         return new ArrayList<>();
