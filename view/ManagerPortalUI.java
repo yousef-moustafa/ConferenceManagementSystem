@@ -1,10 +1,17 @@
 package view;
 
+import model.domain.CommentFeedback;
+import model.domain.Feedback;
+import model.domain.FeedbackReport;
+import model.domain.RatingFeedback;
 import model.domain.enums.SessionStatus;
 import model.dto.AttendeeDTO;
+import model.dto.FeedbackDTO;
 import model.dto.SessionDTO;
 import model.dto.SpeakerDTO;
+import model.repository.FeedbackRepository;
 import model.service.AttendeeService;
+import model.service.FeedbackService;
 import model.service.SessionService;
 import model.service.SpeakerService;
 
@@ -31,10 +38,11 @@ public class ManagerPortalUI extends JFrame {
     private JTextField searchField;
     private JButton searchButton;
     private JButton markAttendanceButton;
-    private JTable table4;
+    private JTable feedbackTable;
     private JButton exportFeedbackReportButton;
     private JComboBox sessionComboBox;
     private JTable sessionAttendeesTable;
+    private JLabel averageFeedbackLabel;
 
     public ManagerPortalUI() {
         setContentPane(ManagerPortalUI);
@@ -78,9 +86,15 @@ public class ManagerPortalUI extends JFrame {
         );
         sessionAttendeesTable.setModel(sessionAttendeesTableModel);
 
+        DefaultTableModel feedbackTableModel = new DefaultTableModel(
+                new String[]{"Feedback ID", "Attendee ID", "Type", "Details"}, 0
+        );
+        feedbackTable.setModel(feedbackTableModel);
+
         SpeakerService speakerService = new SpeakerService();
         SessionService sessionService = new SessionService();
         AttendeeService attendeeService = new AttendeeService(sessionService);
+        FeedbackService feedbackService = new FeedbackService(new FeedbackRepository());
 
         loadSpeakers(speakerTableModel, speakerService);
         loadSessions(sessionTableModel, sessionService, speakerService);
@@ -90,6 +104,10 @@ public class ManagerPortalUI extends JFrame {
         tabbedPane1.addChangeListener(e -> {
             if (tabbedPane1.getSelectedIndex() == 1) {
                 loadSessionsIntoComboBox(sessionComboBox, sessionService);
+            }
+            if (tabbedPane1.getSelectedIndex() == 2) { // Assuming 3rd tab index is 2
+                loadFeedbackTable(feedbackTableModel, feedbackService);
+                updateAverageFeedbackLabel(averageFeedbackLabel, feedbackService);
             }
         });
 
@@ -112,6 +130,10 @@ public class ManagerPortalUI extends JFrame {
                 String sessionID = selectedSession.split(":")[0]; // Extract session ID
                 loadAttendeesForSession(sessionAttendeesTableModel, sessionService, sessionID);
             }
+        });
+
+        exportFeedbackReportButton.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, "Export functionality is under development.");
         });
     }
 
@@ -170,6 +192,21 @@ public class ManagerPortalUI extends JFrame {
             });
         }
     }
+
+    private void loadFeedbackTable(DefaultTableModel feedbackTableModel, FeedbackService feedbackService) {
+        feedbackTableModel.setRowCount(0);
+
+        List<FeedbackDTO> feedbackDTOs = feedbackService.getAllFeedback();
+        for (FeedbackDTO feedback : feedbackDTOs) {
+            feedbackTableModel.addRow(new Object[]{
+                    feedback.getFeedbackID(),
+                    feedback.getAttendeeID(),
+                    feedback.getType(),
+                    feedback.getDetails()
+            });
+        }
+    }
+
 
     private void addSpeaker(DefaultTableModel speakerTableModel, SpeakerService speakerService) {
         JTextField nameField = new JTextField();
@@ -505,6 +542,14 @@ public class ManagerPortalUI extends JFrame {
                     attendee.getEmail()
             });
         }
+    }
+
+    private void updateAverageFeedbackLabel(JLabel averageFeedbackLabel, FeedbackService feedbackService) {
+        FeedbackReport report = feedbackService.getConferenceFeedbackAnalysis();
+        String averageRating = String.format("%.2f", report.getAverageRating());
+        int totalResponses = report.getTotalResponses();
+
+        averageFeedbackLabel.setText("Total Responses: " + totalResponses + " | Average Feedback Rating: " + averageRating);
     }
 
 }

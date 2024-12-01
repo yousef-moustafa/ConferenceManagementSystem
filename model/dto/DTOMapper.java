@@ -5,6 +5,9 @@ import model.domain.Attendee;
 import model.domain.Speaker;
 import model.domain.Conference;
 import model.domain.Certificate;
+import model.domain.Feedback;
+import model.domain.CommentFeedback;
+import model.domain.RatingFeedback;
 
 import java.time.LocalDate;
 
@@ -149,4 +152,25 @@ public class DTOMapper {
                 certificate.getIssueDate()
         );
     }
+
+    // Feedback mappings
+    public static FeedbackDTO mapFeedbackToDTO(Feedback feedback) {
+        if (feedback instanceof RatingFeedback ratingFeedback) {
+            return new FeedbackDTO(
+                    ratingFeedback.getFeedbackID(),
+                    ratingFeedback.getAttendeeID(),
+                    "Rating",
+                    ratingFeedback.getRating() + " / 5"
+            );
+        } else if (feedback instanceof CommentFeedback commentFeedback) {
+            return new FeedbackDTO(
+                    commentFeedback.getFeedbackID(),
+                    commentFeedback.getAttendeeID(),
+                    "Comment",
+                    commentFeedback.getComment()
+            );
+        }
+        throw new IllegalArgumentException("Unknown feedback type.");
+    }
 }
+

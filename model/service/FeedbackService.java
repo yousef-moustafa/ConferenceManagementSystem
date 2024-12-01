@@ -3,6 +3,8 @@ package model.service;
 import model.domain.Feedback;
 import model.domain.RatingFeedback;
 import model.domain.CommentFeedback;
+import model.dto.DTOMapper;
+import model.dto.FeedbackDTO;
 import model.repository.FeedbackRepository;
 import model.domain.FeedbackReport;
 
@@ -51,10 +53,25 @@ public class FeedbackService {
         return feedback;
     }
 
+    // Retrieve all feedback
+    public List<FeedbackDTO> getAllFeedback() {
+        List<Feedback> feedbackList = feedbackRepository.findAll();
+        List<FeedbackDTO> feedbackDTOs = new ArrayList<>();
+
+        for (Feedback feedback : feedbackList) {
+            FeedbackDTO feedbackDTO = DTOMapper.mapFeedbackToDTO(feedback);
+            feedbackDTOs.add(feedbackDTO);
+        }
+
+        return feedbackDTOs;
+    }
+
+
     // Retrieve all feedback for a specific attendee
-    public List<Feedback> getAttendeeAllFeedback(String attendeeID) {
+    public List<FeedbackDTO> getAttendeeAllFeedback(String attendeeID) {
         return feedbackRepository.findAll().stream()
                 .filter(feedback -> feedback.getAttendeeID().equals(attendeeID))
+                .map(DTOMapper::mapFeedbackToDTO)
                 .toList();
     }
 
