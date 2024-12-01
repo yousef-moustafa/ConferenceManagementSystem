@@ -1,6 +1,7 @@
 package view;
 
 import model.dto.SessionDTO;
+import model.dto.SpeakerDTO;
 import model.service.SessionService;
 import model.service.SpeakerService;
 
@@ -49,11 +50,13 @@ public class SpeakerPortalUI extends JFrame {
 
         // Load sessions for the logged-in speaker
         loadSpeakerSessions(speakerSessionTableModel, speakerService, speakerID);
+        loadSpeakerBio(speakerID, speakerService);
 
         // Update the status bar
         statusBar.setText("Logged in as: " + speakerName + " | id: " + speakerID);
 
         viewSessionDetailsButton.addActionListener(e -> viewSessionDetails((DefaultTableModel) speakerSessionsTable.getModel()));
+        saveBioButton.addActionListener(e -> saveSpeakerBio(speakerID, new SpeakerService()));
     }
 
     private void loadSpeakerSessions(DefaultTableModel sessionTableModel, SpeakerService speakerService, String speakerID) {
@@ -100,4 +103,32 @@ public class SpeakerPortalUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Session details could not be retrieved.");
         }
     }
+
+    private void loadSpeakerBio(String speakerID, SpeakerService speakerService) {
+        SpeakerDTO speaker = speakerService.getSpeakerProfile(speakerID);
+        if (speaker != null) {
+            speakerBio.setText(speaker.getBio()); // Set the current bio in the JTextArea
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to load bio for speaker.");
+        }
+    }
+
+    private void saveSpeakerBio(String speakerID, SpeakerService speakerService) {
+        String updatedBio = speakerBio.getText().trim(); // Fetch the updated bio from the JTextArea
+
+        if (updatedBio.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Bio cannot be empty.");
+            return;
+        }
+
+        try {
+            // Update the bio using the SpeakerService
+            speakerService.updateSpeakerBio(speakerID, updatedBio);
+
+            JOptionPane.showMessageDialog(this, "Bio updated successfully!");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Failed to update bio: " + ex.getMessage());
+        }
+    }
+
 }

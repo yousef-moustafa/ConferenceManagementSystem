@@ -30,7 +30,7 @@ public class SpeakerService {
         return speaker.getUserID(); // Return the generated ID for the speaker
     }
 
-    // Update a speaker's profile
+    // Update a speaker's name and bio
     public void updateSpeakerProfile(String speakerID, String name, String bio) {
         Speaker speaker = (Speaker) userRepository.findById(speakerID);
         if (speaker != null) {
@@ -40,6 +40,15 @@ public class SpeakerService {
             if (speaker.getBio() != null) {
                 speaker.setBio(bio);
             }
+            userRepository.save(speaker);
+        }
+    }
+
+    // Update a speaker's bio
+    public void updateSpeakerBio(String speakerID, String bio) {
+        Speaker speaker = (Speaker) userRepository.findById(speakerID);
+        if (speaker != null) {
+            speaker.setBio(bio);
             userRepository.save(speaker);
         }
     }
