@@ -77,24 +77,6 @@ public class SpeakerService {
         return new ArrayList<>();
     }
 
-    // Assign a session to a speaker
-    public void assignSessionToSpeaker(String speakerID, String sessionID) {
-        Speaker speaker = (Speaker) userRepository.findById(speakerID);
-        Session session = sessionRepository.findById(sessionID);
-
-        if (speaker != null && session != null) {
-            // Add sessionID to speaker's associated sessions if not already present
-            if (!speaker.getAssociatedSessionIDs().contains(sessionID)) {
-                speaker.getAssociatedSessionIDs().add(sessionID);
-                userRepository.save(speaker);
-            }
-
-            // Assign speakerID to the session
-            session.setSpeakerID(speakerID);
-            sessionRepository.save(session);
-        }
-    }
-
     // Retrieve all speakers as DTOs along with their IDs
     public List<SpeakerDTO> getAllSpeakers() {
         List<User> users = userRepository.findAll();

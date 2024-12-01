@@ -121,16 +121,17 @@ public class Login extends JFrame {
     }
 
     private void navigateToDashboard(UserRole role) {
+        User currentUser = authService.getCurrentUser();
         JFrame dashboard;
         switch (role) {
             case MANAGER:
                 dashboard = new ManagerPortalUI();
                 break;
             case SPEAKER:
-                dashboard = new SpeakerPortalUI();
+                dashboard = new SpeakerPortalUI(currentUser.getUserID(), currentUser.getUserName());
                 break;
             case ATTENDEE:
-                dashboard = new AttendeePortalUI();
+                dashboard = new AttendeePortalUI(currentUser.getUserID(), currentUser.getUserName());
                 break;
             default:
                 JOptionPane.showMessageDialog(this, "Unknown role.");

@@ -2,6 +2,7 @@ package model.service;
 
 import model.domain.Session;
 import model.domain.Attendee;
+import model.domain.Speaker;
 import model.dto.SessionDTO;
 import model.dto.AttendeeDTO;
 import model.repository.SessionRepository;
@@ -25,6 +26,12 @@ public class SessionService {
     public String createSession(SessionDTO sessionDTO) {
         Session session = DTOMapper.mapDTOToSession(sessionDTO);
         sessionRepository.save(session);
+
+        // Assign session to speaker if a speakerID is provided
+        if (sessionDTO.getSpeakerID() != null) {
+            assignSessionToSpeaker(sessionDTO.getSpeakerID(), session.getSessionID());
+        }
+
         return session.getSessionID();
     }
 
@@ -39,6 +46,12 @@ public class SessionService {
             existingSession.setRoom(sessionDTO.getRoom());
             existingSession.setCapacity(sessionDTO.getCapacity());
             existingSession.setStatus(sessionDTO.getStatus());
+
+            // Check if the speakerID has changed
+            if (!sessionDTO.getSpeakerID().equals(existingSession.getSpeakerID())) {
+                assignSessionToSpeaker(sessionDTO.getSpeakerID(), sessionDTO.getSessionID());
+            }
+
             sessionRepository.save(existingSession);
         }
     }
@@ -120,6 +133,24 @@ public class SessionService {
         // sendNotification(attendeeId, "Session " + session.getSessionName() + " has been cancelled.");
         // }
         //}
+    }
+
+    // Assign a session to a speaker
+    public void assignSessionToSpeaker(String speakerID, String sessionID) {
+        Speaker speaker = (Speaker) userRepository.findById(speakerID);
+        Session session = sessionRepository.findById(sessionID);
+
+        if (speaker != null && session != null) {
+            // Add sessionID to speaker's associated sessions if not already present
+            if (!speaker.getAssociatedSessionIDs().contains(sessionID)) {
+                speaker.getAssociatedSessionIDs().add(sessionID);
+                userRepository.save(speaker);
+            }
+
+            // Assign speakerID to the session
+            session.setSpeakerID(speakerID);
+            sessionRepository.save(session);
+        }
     }
 
 
