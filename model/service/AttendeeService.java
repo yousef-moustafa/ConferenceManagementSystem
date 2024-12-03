@@ -93,6 +93,19 @@ public class AttendeeService {
         return false; // Registration failed
     }
 
+    // Unregister an attendee from a session
+    public boolean unregisterAttendeeFromSession(String attendeeID, String sessionID) {
+        PersonalizedSchedule schedule = getAttendeeSchedule(attendeeID);
+        if (schedule != null) {
+            if (schedule.removeSession(sessionID)) {
+                sessionService.removeAttendeeFromSession(sessionID, attendeeID);
+                saveSchedulesToFile();
+                return true; // Unregistration successful
+            }
+        }
+        return false; // Unregistration failed
+    }
+
     // Get all attendees
     public List<AttendeeDTO> getAllAttendees() {
         List<User> users = userRepository.findAll();
@@ -127,7 +140,7 @@ public class AttendeeService {
                 String attendeeID = data[1];
                 List<String> sessionIDs = new ArrayList<>();
                 if (data.length > 2 && !data[2].isBlank()) {
-                    sessionIDs = Arrays.asList(data[2].split(" "));
+                    sessionIDs = new ArrayList<>(Arrays.asList(data[2].split(" ")));
                 }
                 PersonalizedSchedule schedule = new PersonalizedSchedule(attendeeID, sessionIDs);
                 schedule.setScheduleID(scheduleID); // Set the ID explicitly

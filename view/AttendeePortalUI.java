@@ -18,6 +18,7 @@ public class AttendeePortalUI extends JFrame {
     private JTable conferenceScheduleTable;
     private JButton registerButton;
     private JTable personalizedSchedule;
+    private JButton unregisterButton;
 
     public AttendeePortalUI(String attendeeID, String attendeeName) {
         setContentPane(AttendeePortalUI);
@@ -68,7 +69,15 @@ public class AttendeePortalUI extends JFrame {
         // Update the status bar
         statusBar.setText("Logged in as: " + attendeeName + " | id: " + attendeeID);
 
-        registerButton.addActionListener(e -> registerForSelectedSession(attendeeService, attendeeID));
+        registerButton.addActionListener(e -> {
+            registerForSelectedSession(attendeeService, attendeeID);
+            loadPersonalizedSchedule(personalizedScheduleTableModel, attendeeID, attendeeService, sessionService, speakerService);
+        });
+        unregisterButton.addActionListener(e -> {
+            unregisterFromSelectedSession(attendeeService, attendeeID);
+            loadPersonalizedSchedule(personalizedScheduleTableModel, attendeeID, attendeeService, sessionService, speakerService);
+        });
+
     }
 
     private void loadConferenceSchedule(DefaultTableModel tableModel, SessionService sessionService, SpeakerService speakerService) {
@@ -110,6 +119,26 @@ public class AttendeePortalUI extends JFrame {
             JOptionPane.showMessageDialog(this, "You have successfully registered for the session!");
         } else {
             JOptionPane.showMessageDialog(this, "Registration failed. The session might already be in your schedule or conflicts with another session.");
+        }
+    }
+
+    private void unregisterFromSelectedSession(AttendeeService attendeeService, String attendeeID) {
+        int selectedRow = personalizedSchedule.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a session to unregister.");
+            return;
+        }
+
+        // Get the session ID from the selected row in the table
+        String sessionID = (String) personalizedSchedule.getModel().getValueAt(selectedRow, 0);
+
+        // Call the unregister method in AttendeeService
+        boolean success = attendeeService.unregisterAttendeeFromSession(attendeeID, sessionID);
+
+        if (success) {
+            JOptionPane.showMessageDialog(this, "You have successfully unregistered from the session.");
+        } else {
+            JOptionPane.showMessageDialog(this, "Unregistration failed. The session might not be in your schedule.");
         }
     }
 
