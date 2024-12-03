@@ -58,7 +58,7 @@ public class DTOMapper {
         return new AttendeeDTO(
                 attendee.getUserName(),
                 attendee.getEmail(),
-                attendee.getRegisteredSessionIDs()
+                attendee.getPersonalizedScheduleID()
         );
     }
 
@@ -72,7 +72,6 @@ public class DTOMapper {
                 dto.getEmail(),
                 password,
                 LocalDate.now(),
-                dto.getRegisteredSessionIDs(),
                 null,
                 null,
                 null

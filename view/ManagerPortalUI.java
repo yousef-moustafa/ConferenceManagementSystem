@@ -72,7 +72,7 @@ public class ManagerPortalUI extends JFrame {
         sessionTable.getColumnModel().getColumn(0).setPreferredWidth(0);
 
         DefaultTableModel attendeeTableModel = new DefaultTableModel(
-                new String[]{"ID", "Name", "Email", "Registered Sessions"}, 0
+                new String[]{"ID", "Name", "Email", "Personalized Schedule ID"}, 0
         );
         attendeeTable.setModel(attendeeTableModel);
 
@@ -188,7 +188,7 @@ public class ManagerPortalUI extends JFrame {
                     attendee.getAttendeeID(),
                     attendee.getName(),
                     attendee.getEmail(),
-                    String.join(", ", attendee.getRegisteredSessionIDs())
+                    attendee.getPersonalizedScheduleID()
             });
         }
     }
@@ -517,7 +517,7 @@ public class ManagerPortalUI extends JFrame {
                     attendee.getAttendeeID(),
                     attendee.getName(),
                     attendee.getEmail(),
-                    String.join(", ", attendee.getRegisteredSessionIDs())
+                    attendee.getPersonalizedScheduleID()
             });
         }
     }

@@ -6,21 +6,15 @@ import java.time.LocalDate;
 import java.util.*;
 
 public class Attendee extends User {
-    private List<String> registeredSessionIDs;
     private String personalizedScheduleID;
     private String certificateID;
     private String feedbackID;
 
-    public Attendee(String userName, String email, String password, LocalDate registrationDate, List<String> registeredSessionIDs, String personalizedScheduleID, String certificateID, String feedbackID) {
+    public Attendee(String userName, String email, String password, LocalDate registrationDate, String personalizedScheduleID, String certificateID, String feedbackID) {
         super(userName, email, password, registrationDate, UserRole.ATTENDEE);
-        this.registeredSessionIDs = registeredSessionIDs;
         this.personalizedScheduleID = personalizedScheduleID;
         this.certificateID = certificateID;
         this.feedbackID = feedbackID;
-    }
-
-    public List<String> getRegisteredSessionIDs() {
-        return registeredSessionIDs;
     }
 
     public String getPersonalizedScheduleID() {
@@ -41,7 +35,7 @@ public class Attendee extends User {
 
     @Override
     public String toString() {
-        return super.toString() + ", " + String.join(" ", registeredSessionIDs) + ", " + personalizedScheduleID + ", " + certificateID + ", " + feedbackID;
+        return super.toString() + ", " + personalizedScheduleID + ", " + certificateID + ", " + feedbackID;
     }
 }
 

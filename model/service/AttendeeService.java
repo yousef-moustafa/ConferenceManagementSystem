@@ -8,7 +8,9 @@ import model.dto.DTOMapper;
 import model.repository.UserRepository;
 import model.service.SessionService;
 
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +23,7 @@ public class AttendeeService {
         this.userRepository = new UserRepository();
         this.sessionService = sessionService;
         this.schedules = new ArrayList<>();
+        loadSchedulesFromFile();
     }
 
     // Create a new attendee
@@ -32,13 +35,12 @@ public class AttendeeService {
 
         Attendee attendee = DTOMapper.mapDTOToAttendee(attendeeDTO, password);
 
-        // Create a personalized schedule for the attendee
-        String scheduleID = "SCHEDULE-" + (schedules.size() + 1);
-        PersonalizedSchedule schedule = new PersonalizedSchedule(scheduleID, attendee.getUserID(), new ArrayList<>());
+        PersonalizedSchedule schedule = new PersonalizedSchedule(attendee.getUserID(), new ArrayList<>());
         schedules.add(schedule);
+        attendee.setPersonalizedScheduleID(schedule.getScheduleID());
 
-        attendee.setPersonalizedScheduleID(scheduleID);
         userRepository.save(attendee);
+        saveSchedulesToFile();
 
         return attendee.getUserID(); // Return the new attendee's ID
     }
@@ -61,6 +63,7 @@ public class AttendeeService {
 
     // Get an attendee's personalized schedule
     public PersonalizedSchedule getAttendeeSchedule(String attendeeID) {
+        System.out.println("Schedules: " + schedules);
         return schedules.stream()
                 .filter(schedule -> schedule.getAttendeeID().equals(attendeeID))
                 .findFirst()
@@ -84,6 +87,7 @@ public class AttendeeService {
         if (schedule != null) {
             if (schedule.addSession(sessionID)) {
                 sessionService.addAttendeeToSession(sessionID, attendeeID); // Ensure session reflects the change
+                saveSchedulesToFile();
                 return true; // Registration successful
             }
         }
@@ -110,5 +114,39 @@ public class AttendeeService {
                 .filter(attendee -> attendee.getName().toLowerCase().contains(query.toLowerCase()) ||
                         attendee.getEmail().toLowerCase().contains(query.toLowerCase()))
                 .collect(Collectors.toList());
+    }
+
+    private void loadSchedulesFromFile() {
+        File file = new File("schedules.txt");
+        if (!file.exists()) return; // Skip loading if the file doesn't exist
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(", ");
+                String scheduleID = data[0];
+                String attendeeID = data[1];
+                List<String> sessionIDs = new ArrayList<>();
+                if (data.length > 2 && !data[2].isBlank()) {
+                    sessionIDs = Arrays.asList(data[2].split(" "));
+                }
+                PersonalizedSchedule schedule = new PersonalizedSchedule(attendeeID, sessionIDs);
+                schedule.setScheduleID(scheduleID); // Set the ID explicitly
+                schedules.add(schedule);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveSchedulesToFile() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("schedules.txt"))) {
+            for (PersonalizedSchedule schedule : schedules) {
+                writer.write(schedule.toString());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -5,15 +5,15 @@ public class AttendeeDTO {
     private String attendeeID;
     private String name;
     private String email;
-    private List<String> registeredSessionIDs; // For viewing or managing registered sessions
+    private String personalizedScheduleID; // For viewing or managing registered sessions
 
     public AttendeeDTO() {}
 
     // Constructor without ID
-    public AttendeeDTO(String name, String email, List<String> registeredSessionIDs) {
+    public AttendeeDTO(String name, String email, String personalizedScheduleID) {
         this.name = name;
         this.email = email;
-        this.registeredSessionIDs = registeredSessionIDs;
+        this.personalizedScheduleID = personalizedScheduleID;
     }
 
     // Getters and setters
@@ -25,15 +25,15 @@ public class AttendeeDTO {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    public List<String> getRegisteredSessionIDs() { return registeredSessionIDs; }
-    public void setRegisteredSessionIDs(List<String> registeredSessionIDs) { this.registeredSessionIDs = registeredSessionIDs; }
+    public String getPersonalizedScheduleID() { return personalizedScheduleID; }
+    public void setPersonalizedScheduleID(String personalizedScheduleID) { this.personalizedScheduleID = personalizedScheduleID; }
 
     @Override
     public String toString() {
         return "AttendeeDTO{" +
                 "name='" + name + '\'' +
                 ", email='" + email + '\'' +
-                ", registeredSessionIDs=" + registeredSessionIDs +
+                ", PersonalizedSchedule=" + personalizedScheduleID +
                 '}';
     }
 }

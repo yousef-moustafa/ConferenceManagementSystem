@@ -86,11 +86,10 @@ public class UserRepository implements Repository<User> {
                     user.setUserID(userID);
                     users.add(user);
                 } else if (role == UserRole.ATTENDEE) {
-                    List<String> registeredSessionIDs = Arrays.asList(data[6].split(" "));
-                    String personalizedScheduleID = data[7];
-                    String certificateID = data[8];
-                    String feedbackID = data[9];
-                    user = new Attendee(userName, email, password, registrationDate, registeredSessionIDs, personalizedScheduleID, certificateID, feedbackID);
+                    String personalizedScheduleID = data[6];
+                    String certificateID = data[7];
+                    String feedbackID = data[8];
+                    user = new Attendee(userName, email, password, registrationDate, personalizedScheduleID, certificateID, feedbackID);
                     user.setUserID(userID);
                     users.add(user);
                 }

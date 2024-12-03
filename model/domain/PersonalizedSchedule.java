@@ -7,10 +7,15 @@ public class PersonalizedSchedule {
     private String attendeeID;
     private List<String> sessionIDs;
 
-    public PersonalizedSchedule(String scheduleID, String attendeeID, List<String> sessionsIDs) {
-        this.scheduleID = scheduleID;
+    public PersonalizedSchedule(String attendeeID, List<String> sessionsIDs) {
+        this.scheduleID = generateUniqueID();
         this.attendeeID = attendeeID;
         this.sessionIDs = sessionsIDs;
+    }
+
+    // ID Generator
+    private String generateUniqueID() {
+        return UUID.randomUUID().toString();
     }
 
     // Getters
@@ -43,5 +48,15 @@ public class PersonalizedSchedule {
     public boolean validateSchedule() {
         // Simple validation logic
         return sessionIDs != null && !sessionIDs.isEmpty();
+    }
+
+    // Setter for scheduleID
+    public void setScheduleID(String scheduleID) {
+        this.scheduleID = scheduleID;
+    }
+
+    @Override
+    public String toString() {
+        return scheduleID + ", " + attendeeID + ", " + String.join(" ", sessionIDs);
     }
 }

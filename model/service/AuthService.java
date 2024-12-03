@@ -1,6 +1,7 @@
 package model.service;
 
 import model.domain.Attendee;
+import model.domain.PersonalizedSchedule;
 import model.domain.User;
 import model.domain.enums.AuthResult;
 import model.repository.UserRepository;
@@ -60,17 +61,6 @@ public class AuthService {
         }
     }
 
-    // Validate session access
-    public boolean validateSessionAccess(String attendeeID, String sessionId) {
-        if (attendeeID == null || sessionId == null) {
-            return false;
-        }
-        User user = userRepository.findById(attendeeID);
-        if (user instanceof Attendee attendee) {
-            return attendee.getRegisteredSessionIDs().contains(sessionId);
-        }
-        return false;
-    }
 
     // Get the currently logged-in user
     public User getCurrentUser() {
