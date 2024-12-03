@@ -63,7 +63,6 @@ public class AttendeeService {
 
     // Get an attendee's personalized schedule
     public PersonalizedSchedule getAttendeeSchedule(String attendeeID) {
-        System.out.println("Schedules: " + schedules);
         return schedules.stream()
                 .filter(schedule -> schedule.getAttendeeID().equals(attendeeID))
                 .findFirst()

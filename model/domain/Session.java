@@ -113,7 +113,8 @@ public class Session {
                 time.toString(),
                 room,
                 String.valueOf(capacity),
-                status.toString()
+                status.toString(),
+                String.join(" ", attendeeIDs)
         );
     }
 

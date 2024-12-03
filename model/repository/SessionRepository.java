@@ -65,6 +65,13 @@ public class SessionRepository implements Repository<Session> {
                     session.setRoom(data[5]);
                     session.setCapacity(Integer.parseInt(data[6]));
                     session.setStatus(SessionStatus.valueOf(data[7].toUpperCase()));
+
+                    // Parse attendee IDs (last field)
+                    if (data.length > 8 && !data[8].isBlank()) {
+                        List<String> attendeeIDs = Arrays.asList(data[8].split(" "));
+                        session.getAttendeeIDs().addAll(attendeeIDs);
+                    }
+
                     sessions.add(session);
                 }
             }

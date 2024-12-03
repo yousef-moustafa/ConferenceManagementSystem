@@ -10,6 +10,7 @@ import model.dto.FeedbackDTO;
 import model.dto.SessionDTO;
 import model.dto.SpeakerDTO;
 import model.repository.FeedbackRepository;
+import model.repository.UserRepository;
 import model.service.AttendeeService;
 import model.service.FeedbackService;
 import model.service.SessionService;
@@ -52,7 +53,7 @@ public class ManagerPortalUI extends JFrame {
 
         // Initialize table models with ID columns
         DefaultTableModel speakerTableModel = new DefaultTableModel(
-                new String[]{"ID", "Name", "Email", "Bio", "Associated Sessions"}, 0
+                new String[]{"ID", "Name", "Email", "Bio"}, 0
         );
         speakerTable.setModel(speakerTableModel);
 
@@ -141,14 +142,12 @@ public class ManagerPortalUI extends JFrame {
         speakerTableModel.setRowCount(0);
 
         List<SpeakerDTO> speakers = speakerService.getAllSpeakers();
-
         for (SpeakerDTO speaker : speakers) {
             speakerTableModel.addRow(new Object[]{
                     speaker.getSpeakerID(),
                     speaker.getName(),
                     speaker.getEmail(),
-                    speaker.getBio(),
-                    String.join(", ", speaker.getAssociatedSessionIDs())
+                    speaker.getBio()
             });
         }
     }
@@ -385,8 +384,11 @@ public class ManagerPortalUI extends JFrame {
                 });
 
                 JOptionPane.showMessageDialog(null, "Session added successfully!");
-            } catch (Exception ex) {
+            } catch (IllegalArgumentException ex) {
                 JOptionPane.showMessageDialog(null, "Failed to add session: " + ex.getMessage());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(null, "An unexpected error occurred: " + ex.getMessage());
             }
         }
     }
@@ -471,7 +473,7 @@ public class ManagerPortalUI extends JFrame {
                 // Save the updated session
                 sessionService.updateSession(session);
 
-                // Reload sessions to update the table
+                // Reload sessions to reflect changes
                 loadSessions(sessionTableModel, sessionService, speakerService);
 
                 JOptionPane.showMessageDialog(null, "Session updated successfully!");

@@ -80,7 +80,7 @@ public class UserRepository implements Repository<User> {
                     String bio = data[6];
                     List<String> associatedSessionIDs = new ArrayList<>();
                     if (data.length > 7 && !data[7].isBlank()) {
-                        associatedSessionIDs = Arrays.asList(data[7].split(" "));
+                        associatedSessionIDs = new ArrayList<>(Arrays.asList(data[7].split(" ")));
                     }
                     user = new Speaker(userName, email, password, registrationDate, bio, associatedSessionIDs);
                     user.setUserID(userID);

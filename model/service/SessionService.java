@@ -137,6 +137,8 @@ public class SessionService {
 
     // Assign a session to a speaker
     public void assignSessionToSpeaker(String speakerID, String sessionID) {
+        userRepository.loadFromFile();
+
         Speaker speaker = (Speaker) userRepository.findById(speakerID);
         Session session = sessionRepository.findById(sessionID);
 
