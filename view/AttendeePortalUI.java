@@ -6,6 +6,7 @@ import model.dto.SpeakerDTO;
 import model.service.AttendeeService;
 import model.service.SessionService;
 import model.service.SpeakerService;
+import model.service.FeedbackService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -19,6 +20,11 @@ public class AttendeePortalUI extends JFrame {
     private JButton registerButton;
     private JTable personalizedSchedule;
     private JButton unregisterButton;
+    private JTextArea textArea1;
+    private JButton submitRatingButton;
+    private JButton clearFeedbackButton;
+    private JButton submitCommentButton;
+    private JSlider ratingSlider;
 
     public AttendeePortalUI(String attendeeID, String attendeeName) {
         setContentPane(AttendeePortalUI);
@@ -61,7 +67,9 @@ public class AttendeePortalUI extends JFrame {
 
         SessionService sessionService = new SessionService();
         SpeakerService speakerService = new SpeakerService();
-        AttendeeService attendeeService = new AttendeeService(sessionService);
+        FeedbackService feedbackService = new FeedbackService();
+
+        AttendeeService attendeeService = new AttendeeService(sessionService, feedbackService);
 
         loadConferenceSchedule(conferenceScheduleTableModel, sessionService, speakerService);
         loadPersonalizedSchedule(personalizedScheduleTableModel, attendeeID, attendeeService, sessionService, speakerService);
@@ -76,6 +84,15 @@ public class AttendeePortalUI extends JFrame {
         unregisterButton.addActionListener(e -> {
             unregisterFromSelectedSession(attendeeService, attendeeID);
             loadPersonalizedSchedule(personalizedScheduleTableModel, attendeeID, attendeeService, sessionService, speakerService);
+        });
+
+        submitRatingButton.addActionListener(e -> submitRating(attendeeService, attendeeID));
+        submitCommentButton.addActionListener(e -> submitComment(attendeeService, attendeeID));
+
+        clearFeedbackButton.addActionListener(e -> {
+            ratingSlider.setValue(3); // Reset slider to default
+            textArea1.setText("");    // Clear comment area
+            JOptionPane.showMessageDialog(this, "Feedback fields cleared.", "Info", JOptionPane.INFORMATION_MESSAGE);
         });
 
     }
@@ -172,6 +189,33 @@ public class AttendeePortalUI extends JFrame {
                         session.getRoom()
                 });
             }
+        }
+    }
+
+    private void submitRating(AttendeeService attendeeService, String attendeeID) {
+        try {
+            int rating = ratingSlider.getValue();
+            String feedbackID = attendeeService.submitRating(attendeeID, rating);
+            JOptionPane.showMessageDialog(this, "Rating submitted successfully! Feedback ID: " + feedbackID, "Success", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error submitting rating: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void submitComment(AttendeeService attendeeService, String attendeeID) {
+        try {
+            String comment = textArea1.getText().trim(); // Get comment from text area
+            if (comment.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Comment cannot be empty. Please provide feedback.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            String feedbackID = attendeeService.submitComment(attendeeID, comment);
+            JOptionPane.showMessageDialog(this, "Comment submitted successfully! Feedback ID: " + feedbackID, "Success", JOptionPane.INFORMATION_MESSAGE);
+
+            textArea1.setText("");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error submitting comment: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

@@ -74,6 +74,7 @@ public class DTOMapper {
                 LocalDate.now(),
                 null,
                 null,
+                null,
                 null
         );
         return attendee;

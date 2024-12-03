@@ -8,13 +8,15 @@ import java.util.*;
 public class Attendee extends User {
     private String personalizedScheduleID;
     private String certificateID;
-    private String feedbackID;
+    private String ratingFeedbackID;
+    private String commentFeedbackID;
 
-    public Attendee(String userName, String email, String password, LocalDate registrationDate, String personalizedScheduleID, String certificateID, String feedbackID) {
+    public Attendee(String userName, String email, String password, LocalDate registrationDate, String personalizedScheduleID, String certificateID, String ratingFeedbackID, String commentFeedbackID) {
         super(userName, email, password, registrationDate, UserRole.ATTENDEE);
         this.personalizedScheduleID = personalizedScheduleID;
         this.certificateID = certificateID;
-        this.feedbackID = feedbackID;
+        this.ratingFeedbackID = ratingFeedbackID;
+        this.commentFeedbackID = commentFeedbackID;
     }
 
     public String getPersonalizedScheduleID() {
@@ -29,13 +31,25 @@ public class Attendee extends User {
         return certificateID;
     }
 
-    public String getFeedbackID() {
-        return feedbackID;
+    public String getRatingFeedbackID() {
+        return ratingFeedbackID;
+    }
+
+    public String getCommentFeedbackID() {
+        return commentFeedbackID;
+    }
+
+    public void setRatingFeedbackID(String ratingFeedbackID) {
+        this.ratingFeedbackID = ratingFeedbackID;
+    }
+
+    public void setCommentFeedbackID(String commentFeedbackID) {
+        this.commentFeedbackID = commentFeedbackID;
     }
 
     @Override
     public String toString() {
-        return super.toString() + ", " + personalizedScheduleID + ", " + certificateID + ", " + feedbackID;
+        return super.toString() + ", " + personalizedScheduleID + ", " + certificateID + ", " + ratingFeedbackID + ", " + commentFeedbackID;
     }
 }
 

@@ -19,11 +19,15 @@ public class AttendeeService {
     private final SessionService sessionService; // To handle cross-references between attendees and sessions
     private final List<PersonalizedSchedule> schedules; // Temporary in-memory storage for schedules
 
-    public AttendeeService(SessionService sessionService) {
+    private final FeedbackService feedbackService;
+
+    public AttendeeService(SessionService sessionService, FeedbackService feedbackService) {
         this.userRepository = new UserRepository();
         this.sessionService = sessionService;
         this.schedules = new ArrayList<>();
         loadSchedulesFromFile();
+
+        this.feedbackService = feedbackService;
     }
 
     // Create a new attendee
@@ -160,5 +164,37 @@ public class AttendeeService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String submitRating(String attendeeID, int rating) throws Exception {
+        Attendee attendee = (Attendee) userRepository.findById(attendeeID);
+        if (attendee == null) {
+            throw new Exception("Attendee not found.");
+        }
+        if (attendee.getRatingFeedbackID() != null) {
+            throw new Exception("Rating already submitted. Attendees can only submit one rating.");
+        }
+
+        String feedbackID = feedbackService.submitRating(attendeeID, rating);
+        attendee.setRatingFeedbackID(feedbackID);
+        userRepository.save(attendee);
+
+        return feedbackID;
+    }
+
+    public String submitComment(String attendeeID, String comment) throws Exception {
+        Attendee attendee = (Attendee) userRepository.findById(attendeeID);
+        if (attendee == null) {
+            throw new Exception("Attendee not found.");
+        }
+        if (attendee.getCommentFeedbackID() != null) {
+            throw new Exception("Comment already submitted. Attendees can only submit one comment.");
+        }
+
+        String feedbackID = feedbackService.submitComment(attendeeID, comment);
+        attendee.setCommentFeedbackID(feedbackID);
+        userRepository.save(attendee);
+
+        return feedbackID;
     }
 }

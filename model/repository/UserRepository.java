@@ -88,8 +88,9 @@ public class UserRepository implements Repository<User> {
                 } else if (role == UserRole.ATTENDEE) {
                     String personalizedScheduleID = data[6];
                     String certificateID = data[7];
-                    String feedbackID = data[8];
-                    user = new Attendee(userName, email, password, registrationDate, personalizedScheduleID, certificateID, feedbackID);
+                    String ratingFeedbackID = data[8].isBlank() ? null : data[8];
+                    String commentFeedbackID = data[9].isBlank() ? null : data[9];
+                    user = new Attendee(userName, email, password, registrationDate, personalizedScheduleID, certificateID, ratingFeedbackID, commentFeedbackID);
                     user.setUserID(userID);
                     users.add(user);
                 }

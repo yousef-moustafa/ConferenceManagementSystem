@@ -6,6 +6,7 @@ import model.domain.enums.UserRole;
 import model.service.AttendeeService;
 import model.service.AuthService;
 import model.repository.UserRepository;
+import model.service.FeedbackService;
 import model.service.SessionService;
 
 import javax.swing.*;
@@ -68,7 +69,8 @@ public class Login extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 // Create necessary services
                 SessionService sessionService = new SessionService();
-                AttendeeService attendeeService = new AttendeeService(sessionService);
+                FeedbackService feedbackService = new FeedbackService();
+                AttendeeService attendeeService = new AttendeeService(sessionService, feedbackService);
 
                 JFrame register = new AttendeeRegistrationUI(attendeeService);
                 register.setVisible(true);

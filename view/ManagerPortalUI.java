@@ -94,8 +94,8 @@ public class ManagerPortalUI extends JFrame {
 
         SpeakerService speakerService = new SpeakerService();
         SessionService sessionService = new SessionService();
-        AttendeeService attendeeService = new AttendeeService(sessionService);
-        FeedbackService feedbackService = new FeedbackService(new FeedbackRepository());
+        FeedbackService feedbackService = new FeedbackService();
+        AttendeeService attendeeService = new AttendeeService(sessionService, feedbackService);
 
         loadSpeakers(speakerTableModel, speakerService);
         loadSessions(sessionTableModel, sessionService, speakerService);
