@@ -54,7 +54,7 @@ public class SessionRepository implements Repository<Session> {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(", ");
-                if (data.length == 8) {
+                if (data.length >= 8) {
                     Session session = new Session();
 
                     session.setSessionID(data[0]);
