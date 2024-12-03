@@ -1,5 +1,6 @@
 package view;
 
+import model.domain.PersonalizedSchedule;
 import model.dto.SessionDTO;
 import model.dto.SpeakerDTO;
 import model.service.AttendeeService;
@@ -16,6 +17,7 @@ public class AttendeePortalUI extends JFrame {
     private JLabel statusBar;
     private JTable conferenceScheduleTable;
     private JButton registerButton;
+    private JTable personalizedSchedule;
 
     public AttendeePortalUI(String attendeeID, String attendeeName) {
         setContentPane(AttendeePortalUI);
@@ -38,11 +40,34 @@ public class AttendeePortalUI extends JFrame {
         conferenceScheduleTable.getColumnModel().getColumn(0).setMaxWidth(0);
         conferenceScheduleTable.getColumnModel().getColumn(0).setPreferredWidth(0);
 
+
+        // Create the table model for the personalized schedule
+        DefaultTableModel personalizedScheduleTableModel = new DefaultTableModel(
+                new String[]{"ID", "Title", "Speaker", "Date", "Time", "Room"}, 0
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        personalizedSchedule.setModel(personalizedScheduleTableModel);
+
+        // Hide the ID column
+        personalizedSchedule.getColumnModel().getColumn(0).setMinWidth(0);
+        personalizedSchedule.getColumnModel().getColumn(0).setMaxWidth(0);
+        personalizedSchedule.getColumnModel().getColumn(0).setPreferredWidth(0);
+
+
         SessionService sessionService = new SessionService();
         SpeakerService speakerService = new SpeakerService();
         AttendeeService attendeeService = new AttendeeService(sessionService);
 
         loadConferenceSchedule(conferenceScheduleTableModel, sessionService, speakerService);
+        loadPersonalizedSchedule(personalizedScheduleTableModel, attendeeID, attendeeService, sessionService, speakerService);
+
+        // Update the status bar
+        statusBar.setText("Logged in as: " + attendeeName + " | id: " + attendeeID);
+
         registerButton.addActionListener(e -> registerForSelectedSession(attendeeService, attendeeID));
     }
 
@@ -87,4 +112,38 @@ public class AttendeePortalUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Registration failed. The session might already be in your schedule or conflicts with another session.");
         }
     }
+
+    private void loadPersonalizedSchedule(DefaultTableModel tableModel, String attendeeID, AttendeeService attendeeService, SessionService sessionService, SpeakerService speakerService) {
+        tableModel.setRowCount(0);
+
+        // Get the personalized schedule for the attendee
+        PersonalizedSchedule schedule = attendeeService.getAttendeeSchedule(attendeeID);
+
+        if (schedule == null || schedule.getSessionsIDs().isEmpty()) {
+            return;
+        }
+
+        // Iterate through each session ID in the personalized schedule
+        for (String sessionID : schedule.getSessionsIDs()) {
+            SessionDTO session = sessionService.getSession(sessionID);
+            if (session != null) {
+                String speakerName = "";
+                if (session.getSpeakerID() != null) {
+                    SpeakerDTO speaker = speakerService.getSpeakerProfile(session.getSpeakerID());
+                    if (speaker != null) {
+                        speakerName = speaker.getName();
+                    }
+                }
+                tableModel.addRow(new Object[]{
+                        session.getSessionID(),
+                        session.getSessionName(),
+                        speakerName,
+                        session.getDate(),
+                        session.getTime(),
+                        session.getRoom()
+                });
+            }
+        }
+    }
+
 }
