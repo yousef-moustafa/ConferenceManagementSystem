@@ -10,6 +10,9 @@ import model.service.FeedbackService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 
 public class AttendeePortalUI extends JFrame {
@@ -24,6 +27,8 @@ public class AttendeePortalUI extends JFrame {
     private JButton clearFeedbackButton;
     private JSlider ratingSlider;
     private JButton submitFeedbackButton;
+    private JLabel conferenceScheduleHeaderLabel;
+    private JLabel myScheduleHeaderLabel;
 
     public AttendeePortalUI(String attendeeID, String attendeeName) {
         setContentPane(AttendeePortalUI);
@@ -32,7 +37,7 @@ public class AttendeePortalUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         DefaultTableModel conferenceScheduleTableModel = new DefaultTableModel(
-                new String[]{"ID", "Title", "Speaker", "Date", "Time", "Room"}, 0
+                new String[]{"ID", "Title", "Speaker", "Speaker Bio", "Date", "Time", "Room"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -41,15 +46,18 @@ public class AttendeePortalUI extends JFrame {
         };
         conferenceScheduleTable.setModel(conferenceScheduleTableModel);
 
-        // Hide the ID column
-        conferenceScheduleTable.getColumnModel().getColumn(0).setMinWidth(0);
-        conferenceScheduleTable.getColumnModel().getColumn(0).setMaxWidth(0);
-        conferenceScheduleTable.getColumnModel().getColumn(0).setPreferredWidth(0);
-
+        // Hide the ID and speaker bio column
+        TableColumnModel conferenceColumnModel = conferenceScheduleTable.getColumnModel();
+        conferenceColumnModel.getColumn(0).setMinWidth(0);
+        conferenceColumnModel.getColumn(0).setMaxWidth(0);
+        conferenceColumnModel.getColumn(0).setWidth(0);
+        conferenceColumnModel.getColumn(3).setMinWidth(0);
+        conferenceColumnModel.getColumn(3).setMaxWidth(0);
+        conferenceColumnModel.getColumn(3).setWidth(0);
 
         // Create the table model for the personalized schedule
         DefaultTableModel personalizedScheduleTableModel = new DefaultTableModel(
-                new String[]{"ID", "Title", "Speaker", "Date", "Time", "Room"}, 0
+                new String[]{"ID", "Title", "Speaker", "Speaker Bio", "Date", "Time", "Room"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -59,10 +67,13 @@ public class AttendeePortalUI extends JFrame {
         personalizedSchedule.setModel(personalizedScheduleTableModel);
 
         // Hide the ID column
-        personalizedSchedule.getColumnModel().getColumn(0).setMinWidth(0);
-        personalizedSchedule.getColumnModel().getColumn(0).setMaxWidth(0);
-        personalizedSchedule.getColumnModel().getColumn(0).setPreferredWidth(0);
-
+        TableColumnModel scheduleColumnModel = personalizedSchedule.getColumnModel();
+        scheduleColumnModel.getColumn(0).setMinWidth(0);
+        scheduleColumnModel.getColumn(0).setMaxWidth(0);
+        scheduleColumnModel.getColumn(0).setWidth(0);
+        scheduleColumnModel.getColumn(3).setMinWidth(0);
+        scheduleColumnModel.getColumn(3).setMaxWidth(0);
+        scheduleColumnModel.getColumn(3).setWidth(0);
 
         SessionService sessionService = new SessionService();
         SpeakerService speakerService = new SpeakerService();
@@ -75,6 +86,24 @@ public class AttendeePortalUI extends JFrame {
 
         // Update the status bar
         statusBar.setText("Logged in as: " + attendeeName + " | id: " + attendeeID);
+
+        conferenceScheduleTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = conferenceScheduleTable.getSelectedRow();
+                String speakerBio = conferenceScheduleTable.getValueAt(row, 3).toString(); // Speaker Bio column
+                JOptionPane.showMessageDialog(null, speakerBio, "Speaker Bio", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
+        personalizedSchedule.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = personalizedSchedule.getSelectedRow();
+                String speakerBio = personalizedSchedule.getValueAt(row, 3).toString(); // Speaker Bio column
+                JOptionPane.showMessageDialog(null, speakerBio, "Speaker Bio", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
 
         registerButton.addActionListener(e -> {
             registerForSelectedSession(attendeeService, attendeeID);
@@ -102,16 +131,19 @@ public class AttendeePortalUI extends JFrame {
 
         for (SessionDTO session : sessions) {
             String speakerName = "";
+            String speakerBio = "";
             if (session.getSpeakerID() != null) {
                 SpeakerDTO speaker = speakerService.getSpeakerProfile(session.getSpeakerID());
                 if (speaker != null) {
                     speakerName = speaker.getName();
+                    speakerBio = speaker.getBio();
                 }
             }
             tableModel.addRow(new Object[]{
                     session.getSessionID(),
                     session.getSessionName(),
                     speakerName,
+                    speakerBio,
                     session.getDate(),
                     session.getTime(),
                     session.getRoom(),
@@ -172,16 +204,19 @@ public class AttendeePortalUI extends JFrame {
             SessionDTO session = sessionService.getSession(sessionID);
             if (session != null) {
                 String speakerName = "";
+                String speakerBio = "";
                 if (session.getSpeakerID() != null) {
                     SpeakerDTO speaker = speakerService.getSpeakerProfile(session.getSpeakerID());
                     if (speaker != null) {
                         speakerName = speaker.getName();
+                        speakerBio = speaker.getBio();
                     }
                 }
                 tableModel.addRow(new Object[]{
                         session.getSessionID(),
                         session.getSessionName(),
                         speakerName,
+                        speakerBio,
                         session.getDate(),
                         session.getTime(),
                         session.getRoom()
