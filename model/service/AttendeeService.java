@@ -169,10 +169,7 @@ public class AttendeeService {
     public String submitRating(String attendeeID, int rating) throws Exception {
         Attendee attendee = (Attendee) userRepository.findById(attendeeID);
         if (attendee == null) {
-            throw new Exception("Attendee not found.");
-        }
-        if (attendee.getRatingFeedbackID() != null) {
-            throw new Exception("Rating already submitted. Attendees can only submit one rating.");
+            throw new Exception("Attendee with ID " + attendeeID + " not found.");
         }
 
         String feedbackID = feedbackService.submitRating(attendeeID, rating);
@@ -185,10 +182,7 @@ public class AttendeeService {
     public String submitComment(String attendeeID, String comment) throws Exception {
         Attendee attendee = (Attendee) userRepository.findById(attendeeID);
         if (attendee == null) {
-            throw new Exception("Attendee not found.");
-        }
-        if (attendee.getCommentFeedbackID() != null) {
-            throw new Exception("Comment already submitted. Attendees can only submit one comment.");
+            throw new Exception("Attendee with ID " + attendeeID + " not found.");
         }
 
         String feedbackID = feedbackService.submitComment(attendeeID, comment);

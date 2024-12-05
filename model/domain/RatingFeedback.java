@@ -1,7 +1,7 @@
 package model.domain;
 
 public class RatingFeedback extends Feedback {
-    private final int rating;
+    private int rating;
     private final int maxRating = 5; // Default maximum rating
 
     public RatingFeedback(String attendeeID, int rating) {
@@ -15,6 +15,10 @@ public class RatingFeedback extends Feedback {
     // Getters and Setters for rating
     public int getRating() {
         return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
     }
 
     public int getMaxRating() {

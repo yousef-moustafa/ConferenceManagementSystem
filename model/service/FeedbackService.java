@@ -22,16 +22,36 @@ public class FeedbackService {
 
     // Submit a rating feedback
     public String submitRating(String attendeeID, int rating) {
-        Feedback feedback = new RatingFeedback(attendeeID, rating);
-        feedbackRepository.save(feedback);
-        return feedback.getFeedbackID();
+        // Check for existing rating feedback
+        Feedback existingFeedback = feedbackRepository.findRatingFeedbackByAttendeeID(attendeeID);
+        if (existingFeedback != null) {
+            // Update the existing rating feedback
+            ((RatingFeedback) existingFeedback).setRating(rating);
+            feedbackRepository.save(existingFeedback); // Save the updated feedback
+            return existingFeedback.getFeedbackID();
+        }
+
+        // Create new feedback if none exists
+        Feedback newFeedback = new RatingFeedback(attendeeID, rating);
+        feedbackRepository.save(newFeedback);
+        return newFeedback.getFeedbackID();
     }
 
     // Submit a comment feedback
     public String submitComment(String attendeeID, String comment) {
-        Feedback feedback = new CommentFeedback(attendeeID, comment);
-        feedbackRepository.save(feedback);
-        return feedback.getFeedbackID();
+        // Check for existing comment feedback
+        Feedback existingFeedback = feedbackRepository.findCommentFeedbackByAttendeeID(attendeeID);
+        if (existingFeedback != null) {
+            // Update the existing comment feedback
+            ((CommentFeedback) existingFeedback).setComment(comment);
+            feedbackRepository.save(existingFeedback); // Save the updated feedback
+            return existingFeedback.getFeedbackID();
+        }
+
+        // Create new feedback if none exists
+        Feedback newFeedback = new CommentFeedback(attendeeID, comment);
+        feedbackRepository.save(newFeedback);
+        return newFeedback.getFeedbackID();
     }
 
     // Update an existing feedback

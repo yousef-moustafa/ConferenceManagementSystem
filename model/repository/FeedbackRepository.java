@@ -18,6 +18,9 @@ public class FeedbackRepository implements Repository<Feedback> {
 
     @Override
     public void save(Feedback entity) {
+        // Remove existing feedback with the same ID
+        feedbackList.removeIf(feedback -> feedback.getFeedbackID().equals(entity.getFeedbackID()));
+
         feedbackList.add(entity);
         writeToFile(); // Save feedback to file after adding
     }
@@ -41,6 +44,20 @@ public class FeedbackRepository implements Repository<Feedback> {
     public void delete(String id) {
         feedbackList.removeIf(feedback -> feedback.getFeedbackID().equals(id));
         writeToFile(); // Write changes to file after deletion
+    }
+
+    public Feedback findRatingFeedbackByAttendeeID(String attendeeID) {
+        return feedbackList.stream()
+                .filter(f -> f instanceof RatingFeedback && f.getAttendeeID().equals(attendeeID))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Feedback findCommentFeedbackByAttendeeID(String attendeeID) {
+        return feedbackList.stream()
+                .filter(f -> f instanceof CommentFeedback && f.getAttendeeID().equals(attendeeID))
+                .findFirst()
+                .orElse(null);
     }
 
     public void loadFromFile() {

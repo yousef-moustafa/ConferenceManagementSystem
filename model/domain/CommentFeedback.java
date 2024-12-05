@@ -1,7 +1,7 @@
 package model.domain;
 
 public class CommentFeedback extends Feedback {
-    private final String comment;
+    private String comment;
 
     public CommentFeedback(String attendeeID, String comment) {
         super(attendeeID);
@@ -13,6 +13,10 @@ public class CommentFeedback extends Feedback {
 
     public String getComment() {
         return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     @Override

@@ -20,11 +20,10 @@ public class AttendeePortalUI extends JFrame {
     private JButton registerButton;
     private JTable personalizedSchedule;
     private JButton unregisterButton;
-    private JTextArea textArea1;
-    private JButton submitRatingButton;
+    private JTextArea commentTextArea;
     private JButton clearFeedbackButton;
-    private JButton submitCommentButton;
     private JSlider ratingSlider;
+    private JButton submitFeedbackButton;
 
     public AttendeePortalUI(String attendeeID, String attendeeName) {
         setContentPane(AttendeePortalUI);
@@ -86,12 +85,11 @@ public class AttendeePortalUI extends JFrame {
             loadPersonalizedSchedule(personalizedScheduleTableModel, attendeeID, attendeeService, sessionService, speakerService);
         });
 
-        submitRatingButton.addActionListener(e -> submitRating(attendeeService, attendeeID));
-        submitCommentButton.addActionListener(e -> submitComment(attendeeService, attendeeID));
+        submitFeedbackButton.addActionListener(e -> submitFeedback(attendeeService, attendeeID));
 
         clearFeedbackButton.addActionListener(e -> {
             ratingSlider.setValue(3); // Reset slider to default
-            textArea1.setText("");    // Clear comment area
+            commentTextArea.setText("");    // Clear comment area
             JOptionPane.showMessageDialog(this, "Feedback fields cleared.", "Info", JOptionPane.INFORMATION_MESSAGE);
         });
 
@@ -192,30 +190,28 @@ public class AttendeePortalUI extends JFrame {
         }
     }
 
-    private void submitRating(AttendeeService attendeeService, String attendeeID) {
+    private void submitFeedback(AttendeeService attendeeService, String attendeeID) {
         try {
-            int rating = ratingSlider.getValue();
-            String feedbackID = attendeeService.submitRating(attendeeID, rating);
-            JOptionPane.showMessageDialog(this, "Rating submitted successfully! Feedback ID: " + feedbackID, "Success", JOptionPane.INFORMATION_MESSAGE);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error submitting rating: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
+            // Retrieve rating from the slider (mandatory)
+            int rating = ratingSlider.getValue(); // Assume this is the JSlider instance
 
-    private void submitComment(AttendeeService attendeeService, String attendeeID) {
-        try {
-            String comment = textArea1.getText().trim(); // Get comment from text area
-            if (comment.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Comment cannot be empty. Please provide feedback.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
+            // Retrieve comment from the text area (optional)
+            String comment = commentTextArea.getText().trim(); // Assume this is the JTextArea instance
+
+            // Submit rating feedback
+            String ratingFeedbackID = attendeeService.submitRating(attendeeID, rating);
+
+            // If a comment is provided, submit it as well
+            if (!comment.isEmpty()) {
+                String commentFeedbackID = attendeeService.submitComment(attendeeID, comment);
+                JOptionPane.showMessageDialog(this, "Feedback submitted successfully!\n"
+                        + "Rating ID: " + ratingFeedbackID + "\nComment ID: " + commentFeedbackID);
+            } else {
+                JOptionPane.showMessageDialog(this, "Rating submitted successfully!\nRating ID: " + ratingFeedbackID);
             }
-
-            String feedbackID = attendeeService.submitComment(attendeeID, comment);
-            JOptionPane.showMessageDialog(this, "Comment submitted successfully! Feedback ID: " + feedbackID, "Success", JOptionPane.INFORMATION_MESSAGE);
-
-            textArea1.setText("");
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error submitting comment: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) { // Catch generic exceptions
+            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Submission Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace(); // Optional: Log error details
         }
     }
 
