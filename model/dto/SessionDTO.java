@@ -3,6 +3,8 @@ import model.domain.enums.SessionStatus;
 
 import java.util.Date;
 import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SessionDTO {
     private String sessionID;
@@ -13,10 +15,12 @@ public class SessionDTO {
     private String room;
     private int capacity;
     private SessionStatus status;
+    private Map<String, Boolean> attendeeAttendance = new HashMap<>();
+
 
     public SessionDTO() {}
 
-    public SessionDTO(String sessionID, String sessionName, String speakerID, Date date, LocalTime time, String room, int capacity, SessionStatus status) {
+    public SessionDTO(String sessionID, String sessionName, String speakerID, Date date, LocalTime time, String room, int capacity, SessionStatus status, Map<String, Boolean> attendeeAttendance) {
         this.sessionID = sessionID;
         this.sessionName = sessionName;
         this.speakerID = speakerID;
@@ -25,6 +29,7 @@ public class SessionDTO {
         this.room = room;
         this.capacity = capacity;
         this.status = status;
+        this.attendeeAttendance = attendeeAttendance;
     }
 
     // Getters and setters

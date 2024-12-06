@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SessionRepository implements Repository<Session> {
     private ArrayList<Session> sessions = new ArrayList<>();
@@ -70,6 +71,17 @@ public class SessionRepository implements Repository<Session> {
                     if (data.length > 8 && !data[8].isBlank()) {
                         List<String> attendeeIDs = Arrays.asList(data[8].split(" "));
                         session.getAttendeeIDs().addAll(attendeeIDs);
+                    }
+
+                    // Parse attendee attendance (if available)
+                    if (data.length > 9 && !data[9].isBlank()) {
+                        Map<String, Boolean> attendeeAttendance = Arrays.stream(data[9].split(";"))
+                                .map(entry -> entry.split(":"))
+                                .collect(Collectors.toMap(
+                                        entry -> entry[0], // Attendee ID
+                                        entry -> Boolean.parseBoolean(entry[1]) // Attendance status
+                                ));
+                        session.setAttendeeAttendance(attendeeAttendance);
                     }
 
                     sessions.add(session);

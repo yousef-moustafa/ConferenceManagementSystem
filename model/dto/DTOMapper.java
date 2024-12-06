@@ -10,6 +10,8 @@ import model.domain.CommentFeedback;
 import model.domain.RatingFeedback;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class DTOMapper {
@@ -28,7 +30,8 @@ public class DTOMapper {
                 session.getTime(),
                 session.getRoom(),
                 session.getCapacity(),
-                session.getStatus()
+                session.getStatus(),
+                new HashMap<>() // initialise attendance as empty
         );
     }
 
@@ -45,6 +48,7 @@ public class DTOMapper {
         session.setRoom(dto.getRoom());
         session.setCapacity(dto.getCapacity());
         session.setStatus(dto.getStatus());
+        // attendeeAttendance is DTO-specific, not mapped back
         return session;
     }
 

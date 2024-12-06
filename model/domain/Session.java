@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 
 import java.util.*;
 import java.time.*;
+import java.util.stream.Collectors;
 
 public class Session {
     private String sessionID;
@@ -18,6 +19,7 @@ public class Session {
     private List<String> attendeeIDs;
     private int capacity;
     private SessionStatus status;
+    private Map<String, Boolean> attendeeAttendance = new HashMap<>();
 
 
     public Session() {
@@ -71,6 +73,10 @@ public class Session {
         return attendeeIDs;
     }
 
+    public Map<String, Boolean> getAttendeeAttendance() {
+        return attendeeAttendance;
+    }
+
     // Setters
     public void setSessionID(String sessionID) { this.sessionID = sessionID; }
 
@@ -102,9 +108,18 @@ public class Session {
         this.status = status;
     }
 
+    public void setAttendeeAttendance(Map<String, Boolean> attendeeAttendance) {
+        this.attendeeAttendance = attendeeAttendance;
+    }
+
     @Override
     public String toString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String attendance = attendeeAttendance.entrySet()
+                .stream()
+                .map(entry -> entry.getKey() + ":" + entry.getValue())
+                .collect(Collectors.joining(";"));
+
         return String.join(", ",
                 sessionID,
                 sessionName,
@@ -114,7 +129,8 @@ public class Session {
                 room,
                 String.valueOf(capacity),
                 status.toString(),
-                String.join(" ", attendeeIDs)
+                String.join(" ", attendeeIDs),
+                attendance
         );
     }
 
