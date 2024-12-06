@@ -12,6 +12,7 @@ import model.domain.RatingFeedback;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 
 public class DTOMapper {
@@ -62,7 +63,8 @@ public class DTOMapper {
         return new AttendeeDTO(
                 attendee.getUserName(),
                 attendee.getEmail(),
-                attendee.getPersonalizedScheduleID()
+                attendee.getPersonalizedScheduleID(),
+                new ArrayList<>(attendee.getAttendedSessions())
         );
     }
 
@@ -71,17 +73,17 @@ public class DTOMapper {
             return null;
         }
 
-        Attendee attendee = new Attendee(
+        return new Attendee(
                 dto.getName(),
                 dto.getEmail(),
                 password,
                 LocalDate.now(),
+                dto.getPersonalizedScheduleID(),
                 null,
                 null,
                 null,
-                null
+                new HashSet<>(dto.getAttendedSessions()) // Convert List to Set
         );
-        return attendee;
     }
 
     // Speaker mappings

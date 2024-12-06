@@ -7,9 +7,7 @@ import model.domain.enums.UserRole;
 
 import java.io.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class UserRepository implements Repository<User> {
     private List<User> users = new ArrayList<>();
@@ -90,7 +88,14 @@ public class UserRepository implements Repository<User> {
                     String certificateID = data[7];
                     String ratingFeedbackID = data[8].isBlank() ? null : data[8];
                     String commentFeedbackID = data[9].isBlank() ? null : data[9];
-                    user = new Attendee(userName, email, password, registrationDate, personalizedScheduleID, certificateID, ratingFeedbackID, commentFeedbackID);
+
+                    // Parse attendedSessions (if available)
+                    Set<String> attendedSessions = new HashSet<>();
+                    if (data.length > 10 && !data[10].isBlank()) {
+                        attendedSessions.addAll(Arrays.asList(data[10].split(";")));
+                    }
+
+                    user = new Attendee(userName, email, password, registrationDate, personalizedScheduleID, certificateID, ratingFeedbackID, commentFeedbackID, attendedSessions);
                     user.setUserID(userID);
                     users.add(user);
                 }

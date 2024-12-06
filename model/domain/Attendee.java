@@ -10,13 +10,15 @@ public class Attendee extends User {
     private String certificateID;
     private String ratingFeedbackID;
     private String commentFeedbackID;
+    private Set<String> attendedSessions = new HashSet<>();
 
-    public Attendee(String userName, String email, String password, LocalDate registrationDate, String personalizedScheduleID, String certificateID, String ratingFeedbackID, String commentFeedbackID) {
+    public Attendee(String userName, String email, String password, LocalDate registrationDate, String personalizedScheduleID, String certificateID, String ratingFeedbackID, String commentFeedbackID, Set<String> attendedSessions) {
         super(userName, email, password, registrationDate, UserRole.ATTENDEE);
         this.personalizedScheduleID = personalizedScheduleID;
         this.certificateID = certificateID;
         this.ratingFeedbackID = ratingFeedbackID;
         this.commentFeedbackID = commentFeedbackID;
+        this.attendedSessions = attendedSessions;
     }
 
     public String getPersonalizedScheduleID() {
@@ -47,9 +49,18 @@ public class Attendee extends User {
         this.commentFeedbackID = commentFeedbackID;
     }
 
+    public Set<String> getAttendedSessions() {
+        return attendedSessions;
+    }
+
+    public void setAttendedSessions(Set<String> attendedSessions) {
+        this.attendedSessions = attendedSessions;
+    }
+
     @Override
     public String toString() {
-        return super.toString() + ", " + personalizedScheduleID + ", " + certificateID + ", " + ratingFeedbackID + ", " + commentFeedbackID;
+        return super.toString() + ", " + personalizedScheduleID + ", " + certificateID + ", " + ratingFeedbackID + ", " + commentFeedbackID +
+                ", " + String.join(";", attendedSessions);
     }
 }
 
