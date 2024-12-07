@@ -45,7 +45,7 @@ public class AttendeeService {
 
         userRepository.save(attendee);
         saveSchedulesToFile();
-
+        System.out.println(attendee.getUserID());
         return attendee.getUserID(); // Return the new attendee's ID
     }
 

@@ -61,6 +61,7 @@ public class DTOMapper {
         }
 
         return new AttendeeDTO(
+                attendee.getUserID(),
                 attendee.getUserName(),
                 attendee.getEmail(),
                 attendee.getPersonalizedScheduleID(),

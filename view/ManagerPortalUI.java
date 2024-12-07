@@ -133,6 +133,8 @@ public class ManagerPortalUI extends JFrame {
             }
         });
 
+        markAttendanceButton.addActionListener(e -> markAttendanceForSelectedSession(sessionAttendeesTableModel, sessionService, attendeeService));
+
         exportFeedbackReportButton.addActionListener(e -> {
             JOptionPane.showMessageDialog(this, "Export functionality is under development.");
         });
@@ -543,6 +545,42 @@ public class ManagerPortalUI extends JFrame {
                     attendee.getName(),
                     attendee.getEmail()
             });
+        }
+    }
+
+    private void markAttendanceForSelectedSession(DefaultTableModel sessionAttendeesTableModel, SessionService sessionService, AttendeeService attendeeService) {
+        String selectedSession = (String) sessionComboBox.getSelectedItem();
+        if (selectedSession == null) {
+            JOptionPane.showMessageDialog(this, "Please select a session.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String sessionID = selectedSession.split(":")[0]; // Extract session ID
+
+        // Ensure at least one attendee is selected
+        int[] selectedRows = sessionAttendeesTable.getSelectedRows();
+        if (selectedRows.length == 0) {
+            JOptionPane.showMessageDialog(this, "Please select at least one attendee to mark attendance.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Collect attendance data
+        try {
+            for (int row : selectedRows) {
+                String attendeeID = (String) sessionAttendeesTableModel.getValueAt(row, 0); // Get attendee ID from the first column
+                boolean attended = true; // Assume marking as present
+
+                // Call AttendeeService to update attendance
+                attendeeService.markAttendance(attendeeID, sessionID, attended);
+            }
+
+            // Show success message
+            JOptionPane.showMessageDialog(this, "Attendance marked successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+            // Optionally refresh the table or UI
+            loadAttendeesForSession(sessionAttendeesTableModel, sessionService, sessionID);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "An error occurred while marking attendance: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

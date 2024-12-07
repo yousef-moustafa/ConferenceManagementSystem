@@ -12,7 +12,8 @@ public class AttendeeDTO {
     public AttendeeDTO() {}
 
     // Constructor without ID
-    public AttendeeDTO(String name, String email, String personalizedScheduleID, List<String> attendedSessions) {
+    public AttendeeDTO(String attendeeID, String name, String email, String personalizedScheduleID, List<String> attendedSessions) {
+        this.attendeeID = attendeeID;
         this.name = name;
         this.email = email;
         this.personalizedScheduleID = personalizedScheduleID;
@@ -21,6 +22,9 @@ public class AttendeeDTO {
 
     // Getters and setters
     public String getAttendeeID() { return attendeeID; }
+    public void setAttendeeID(String attendeeID) {
+        this.attendeeID = attendeeID;
+    }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

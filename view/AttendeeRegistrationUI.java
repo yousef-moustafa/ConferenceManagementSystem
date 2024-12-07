@@ -66,11 +66,12 @@ public class AttendeeRegistrationUI extends JFrame {
         // Create AttendeeDTO
         String personalizedScheduleID = ""; // No schedule at registration
         List<String> attendedSessions = new ArrayList<>(); // Attendee did not attend any sessions at registration
-        AttendeeDTO attendeeDTO = new AttendeeDTO(name, email, personalizedScheduleID, attendedSessions);
+        AttendeeDTO attendeeDTO = new AttendeeDTO(null, name, email, personalizedScheduleID, attendedSessions);
 
         try {
             // Create attendee using the service
             String attendeeID = attendeeService.createAttendee(attendeeDTO, password);
+            attendeeDTO.setAttendeeID(attendeeID);
 
             // Show success message
             JOptionPane.showMessageDialog(this, "Registration successful! Your ID: " + attendeeID);
