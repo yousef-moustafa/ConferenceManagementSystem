@@ -208,6 +208,17 @@ public class AttendeeService {
         userRepository.save(attendee);
     }
 
+    // Update the certificateID for an attendee
+    public void updateAttendeeCertificateID(String attendeeID, String certificateID) {
+        Attendee attendee = (Attendee) userRepository.findById(attendeeID);
+        if (attendee == null) {
+            throw new IllegalArgumentException("Attendee with ID " + attendeeID + " not found.");
+        }
+
+        attendee.setCertificateID(certificateID);
+        userRepository.save(attendee); // Persist the updated attendee
+    }
+
     // Mark attendance for an attendee in a session
     public void markAttendance(String attendeeID, String sessionID, boolean attended) {
         // Delegate session-level attendance update

@@ -6,10 +6,7 @@ import model.dto.AttendeeDTO;
 import model.dto.FeedbackDTO;
 import model.dto.SessionDTO;
 import model.dto.SpeakerDTO;
-import model.service.AttendeeService;
-import model.service.FeedbackService;
-import model.service.SessionService;
-import model.service.SpeakerService;
+import model.service.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -106,6 +103,7 @@ public class ManagerPortalUI extends JFrame {
         SessionService sessionService = new SessionService();
         FeedbackService feedbackService = new FeedbackService();
         AttendeeService attendeeService = new AttendeeService(sessionService, feedbackService);
+        CertificateService certificateService = new CertificateService(attendeeService);
 
         loadSpeakers(speakerTableModel, speakerService);
         loadSessions(sessionTableModel, sessionService, speakerService);
@@ -144,6 +142,7 @@ public class ManagerPortalUI extends JFrame {
         });
 
         markAttendanceButton.addActionListener(e -> markAttendanceForSelectedSession(sessionAttendeesTableModel, sessionService, attendeeService));
+        issueCertificatesButton.addActionListener(e -> issueCertificatesForDisplayedAttendees(certificateService));
 
         exportFeedbackReportButton.addActionListener(e -> {
             JOptionPane.showMessageDialog(this, "Export functionality is under development.");
@@ -605,4 +604,37 @@ public class ManagerPortalUI extends JFrame {
         averageFeedbackLabel.setText("Total Responses: " + totalResponses + " | Average Feedback Rating: " + averageRating);
     }
 
+
+    private void issueCertificatesForDisplayedAttendees(CertificateService certificateService) {
+        try {
+            // Get attendee IDs from the attendeeTable
+            List<String> attendeeIDs = getDisplayedAttendeeIDs();
+
+            // Check if there are attendees to process
+            if (attendeeIDs.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No attendees to process.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Call the CertificateService to generate certificates
+            List<String> issuedCertificates = certificateService.generateCertificatesForEligibleAttendees(attendeeIDs, "GAF-AI 2025");
+
+            // Provide feedback to the user
+            JOptionPane.showMessageDialog(this, issuedCertificates.size() + " certificates issued successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (Exception ex) {
+            // Handle errors and show an error message
+            JOptionPane.showMessageDialog(this, "Error issuing certificates: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // Helper method to retrieve attendee IDs from the attendeeTable
+    private List<String> getDisplayedAttendeeIDs() {
+        List<String> attendeeIDs = new ArrayList<>();
+        for (int row = 0; row < attendeeTable.getRowCount(); row++) {
+            String attendeeID = (String) attendeeTable.getValueAt(row, 0); // Retrieve ID from column 0
+            attendeeIDs.add(attendeeID);
+        }
+        return attendeeIDs;
+    }
 }

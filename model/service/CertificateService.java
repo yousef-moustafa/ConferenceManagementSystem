@@ -5,7 +5,6 @@ import model.domain.PersonalizedSchedule;
 import model.dto.AttendeeDTO;
 import model.dto.CertificateDTO;
 import model.repository.CertificateRepository;
-import model.repository.UserRepository;
 import model.dto.DTOMapper;
 
 import java.util.ArrayList;
@@ -17,8 +16,8 @@ public class CertificateService {
     private final CertificateRepository certificateRepository;
     private final AttendeeService attendeeService;
 
-    public CertificateService(CertificateRepository certificateRepository, AttendeeService attendeeService) {
-        this.certificateRepository = certificateRepository;
+    public CertificateService(AttendeeService attendeeService) {
+        this.certificateRepository = new CertificateRepository();
         this.attendeeService = attendeeService;
     }
 
@@ -36,6 +35,10 @@ public class CertificateService {
         // Create and save a new certificate
         Certificate certificate = new Certificate(attendeeID, conferenceName, new Date());
         certificateRepository.save(certificate);
+
+        // Update the attendee's certificateID
+        attendeeService.updateAttendeeCertificateID(attendeeID, certificate.getCertificateID());
+
         return certificate.getCertificateID();
     }
 
@@ -61,22 +64,28 @@ public class CertificateService {
 
     // Check eligibility for a certificate
     private boolean isEligibleForCertificate(String attendeeID) {
-        // Retrieve the attendee's profile using AttendeeService
         AttendeeDTO attendee = attendeeService.getAttendeeProfile(attendeeID);
         if (attendee == null) {
             return false;
         }
-
-        // Fetch the attendee's personalized schedule
         PersonalizedSchedule schedule = attendeeService.getAttendeeSchedule(attendeeID);
         if (schedule == null) {
             return false;
         }
 
-        // Check if all registered sessions are attended
-        List<String> attendedSessions = attendee.getAttendedSessions();
         List<String> registeredSessions = schedule.getSessionsIDs();
-        return attendedSessions.containsAll(registeredSessions);
+        List<String> attendedSessions = attendee.getAttendedSessions();
+
+        // Check if registeredSessions is empty
+        if (registeredSessions.isEmpty()) {
+            System.out.println("Attendee " + attendeeID + " is not registered for any sessions.");
+            return false; // Ineligible if attendee is not yet registered to any sessions
+        }
+
+        // Check if all registered sessions are attended
+        boolean eligible = attendedSessions.containsAll(registeredSessions);
+        System.out.println("Attendee " + attendeeID + " eligible: " + eligible);
+        return eligible;
     }
 
     // Retrieve certificate associated with a specific attendee

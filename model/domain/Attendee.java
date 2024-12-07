@@ -57,6 +57,11 @@ public class Attendee extends User {
         this.attendedSessions = attendedSessions;
     }
 
+    public void setCertificateID(String certificateID) {
+        this.certificateID = certificateID;
+    }
+
+
     @Override
     public String toString() {
         return super.toString() + ", " + personalizedScheduleID + ", " + certificateID + ", " + ratingFeedbackID + ", " + commentFeedbackID +
