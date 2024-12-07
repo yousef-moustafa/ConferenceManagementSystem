@@ -12,6 +12,7 @@ import model.domain.enums.SessionStatus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class SessionService {
     private final SessionRepository sessionRepository;
@@ -85,6 +86,8 @@ public class SessionService {
         Session session = sessionRepository.findById(sessionId);
         if (session != null && session.getAttendeeCount() < session.getCapacity()) {
             session.getAttendeeIDs().add(attendeeId);
+
+            session.getAttendeeAttendance().put(attendeeId, false); // Default to "not present"
             sessionRepository.save(session);
         }
     }
@@ -94,6 +97,7 @@ public class SessionService {
         Session session = sessionRepository.findById(sessionId);
         if (session != null) {
             session.getAttendeeIDs().remove(attendeeId);
+            session.getAttendeeAttendance().remove(attendeeId); // Remove attendance entry
             sessionRepository.save(session);
         }
     }
@@ -154,6 +158,28 @@ public class SessionService {
             sessionRepository.save(session);
         }
     }
+
+    // Method for marking attendance for a single attendee
+    public void markAttendance(String sessionID, String attendeeID, boolean attended) {
+        Session session = sessionRepository.findById(sessionID);
+        if (session == null) {
+            throw new IllegalArgumentException("Session not found with ID: " + sessionID);
+        }
+
+        // Update or add the specific attendee's attendance in the existing map
+        session.getAttendeeAttendance().put(attendeeID, attended);
+
+        // Persist the updated session
+        sessionRepository.save(session);
+    }
+
+    // Method to handle bulk attendance updates (if needed)
+    public void markAttendance(String sessionID, Map<String, Boolean> attendanceMap) {
+        for (Map.Entry<String, Boolean> entry : attendanceMap.entrySet()) {
+            markAttendance(sessionID, entry.getKey(), entry.getValue());
+        }
+    }
+
 
 
 }

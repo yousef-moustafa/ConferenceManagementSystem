@@ -191,4 +191,29 @@ public class AttendeeService {
 
         return feedbackID;
     }
+
+    // Method to Update Attendee Attendance
+    public void updateAttendeeAttendance(String attendeeID, String sessionID, boolean attended) {
+        Attendee attendee = (Attendee) userRepository.findById(attendeeID);
+        if (attendee == null) {
+            throw new IllegalArgumentException("Attendee with ID " + attendeeID + " not found.");
+        }
+
+        if (attended) {
+            attendee.getAttendedSessions().add(sessionID);
+        } else {
+            attendee.getAttendedSessions().remove(sessionID);
+        }
+
+        userRepository.save(attendee);
+    }
+
+    // Mark attendance for an attendee in a session
+    public void markAttendance(String attendeeID, String sessionID, boolean attended) {
+        // Delegate session-level attendance update
+        sessionService.markAttendance(sessionID, attendeeID, attended);
+
+        // Update attendee-level attendance
+        updateAttendeeAttendance(attendeeID, sessionID, attended);
+    }
 }
