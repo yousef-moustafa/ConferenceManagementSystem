@@ -15,17 +15,25 @@ import java.util.List;
 public class CertificateService {
 
     private final CertificateRepository certificateRepository;
-    private final UserRepository userRepository;
     private final AttendeeService attendeeService;
 
-    public CertificateService(CertificateRepository certificateRepository, UserRepository userRepository, AttendeeService attendeeService) {
+    public CertificateService(CertificateRepository certificateRepository, AttendeeService attendeeService) {
         this.certificateRepository = certificateRepository;
-        this.userRepository = userRepository;
         this.attendeeService = attendeeService;
     }
 
     // Generate a certificate for a single attendee
     public String generateCertificate(String attendeeID, String conferenceName) {
+        // Check if a certificate already exists for the attendee and conference
+        boolean certificateExists = certificateRepository.findAll().stream()
+                .anyMatch(certificate -> certificate.getAttendeeID().equals(attendeeID)
+                        && certificate.getConferenceName().equals(conferenceName));
+
+        if (certificateExists) {
+            throw new IllegalArgumentException("Certificate already exists for attendee: " + attendeeID);
+        }
+
+        // Create and save a new certificate
         Certificate certificate = new Certificate(attendeeID, conferenceName, new Date());
         certificateRepository.save(certificate);
         return certificate.getCertificateID();
@@ -70,5 +78,17 @@ public class CertificateService {
         List<String> registeredSessions = schedule.getSessionsIDs();
         return attendedSessions.containsAll(registeredSessions);
     }
+
+    // Retrieve certificate associated with a specific attendee
+    public CertificateDTO getCertificateForAttendee(String attendeeID) {
+        for (Certificate certificate : certificateRepository.findAll()) {
+            if (certificate.getAttendeeID().equals(attendeeID)) {
+                return DTOMapper.mapCertificateToDTO(certificate); // Convert to DTO
+            }
+        }
+        // Return null or throw an exception if no certificate is found
+        throw new IllegalArgumentException("No certificate found for attendee with ID: " + attendeeID);
+    }
+
 
 }
