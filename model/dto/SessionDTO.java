@@ -57,6 +57,13 @@ public class SessionDTO {
     public SessionStatus getStatus() { return status; }
     public void setStatus(SessionStatus status) { this.status = status; }
 
+    public Map<String, Boolean> getAttendeeAttendance() {
+        return attendeeAttendance;
+    }
+    public void setAttendeeAttendance(Map<String, Boolean> attendeeAttendance) {
+        this.attendeeAttendance = attendeeAttendance;
+    }
+
     @Override
     public String toString() {
         return "SessionDTO{" +

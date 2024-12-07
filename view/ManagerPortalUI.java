@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ManagerPortalUI extends JFrame {
     private JPanel ManagerPortalUI;
@@ -83,8 +84,21 @@ public class ManagerPortalUI extends JFrame {
         attendeeTable.getColumnModel().getColumn(0).setPreferredWidth(0);
 
         DefaultTableModel sessionAttendeesTableModel = new DefaultTableModel(
-                new String[]{"ID", "Name", "Email"}, 0
-        );
+                new String[]{"ID", "Name", "Email", "Attended"}, 0
+        ) {
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 3) { // "Attended" column
+                    return Boolean.class;
+                }
+                return String.class;
+            }
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return column == 3; // Only "Attended" column is editable
+            }
+        };
         sessionAttendeesTable.setModel(sessionAttendeesTableModel);
 
         DefaultTableModel feedbackTableModel = new DefaultTableModel(
@@ -539,11 +553,14 @@ public class ManagerPortalUI extends JFrame {
         sessionAttendeesTableModel.setRowCount(0);
 
         List<AttendeeDTO> attendees = sessionService.getSessionAttendees(sessionID);
+        Map<String, Boolean> attendanceMap = sessionService.getSession(sessionID).getAttendeeAttendance();
         for (AttendeeDTO attendee : attendees) {
+            Boolean attended = attendanceMap.getOrDefault(attendee.getAttendeeID(), false);
             sessionAttendeesTableModel.addRow(new Object[]{
                     attendee.getAttendeeID(),
                     attendee.getName(),
-                    attendee.getEmail()
+                    attendee.getEmail(),
+                    attended
             });
         }
     }
@@ -568,7 +585,7 @@ public class ManagerPortalUI extends JFrame {
         try {
             for (int row : selectedRows) {
                 String attendeeID = (String) sessionAttendeesTableModel.getValueAt(row, 0); // Get attendee ID from the first column
-                boolean attended = true; // Assume marking as present
+                Boolean attended = (Boolean) sessionAttendeesTableModel.getValueAt(row, 3);
 
                 // Call AttendeeService to update attendance
                 attendeeService.markAttendance(attendeeID, sessionID, attended);
