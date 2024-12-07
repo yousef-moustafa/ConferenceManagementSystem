@@ -1,16 +1,11 @@
 package view;
 
-import model.domain.CommentFeedback;
-import model.domain.Feedback;
 import model.domain.FeedbackReport;
-import model.domain.RatingFeedback;
 import model.domain.enums.SessionStatus;
 import model.dto.AttendeeDTO;
 import model.dto.FeedbackDTO;
 import model.dto.SessionDTO;
 import model.dto.SpeakerDTO;
-import model.repository.FeedbackRepository;
-import model.repository.UserRepository;
 import model.service.AttendeeService;
 import model.service.FeedbackService;
 import model.service.SessionService;
@@ -45,6 +40,7 @@ public class ManagerPortalUI extends JFrame {
     private JComboBox sessionComboBox;
     private JTable sessionAttendeesTable;
     private JLabel averageFeedbackLabel;
+    private JButton issueCertificatesButton;
 
     public ManagerPortalUI() {
         setContentPane(ManagerPortalUI);
