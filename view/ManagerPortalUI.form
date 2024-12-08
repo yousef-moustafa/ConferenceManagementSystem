@@ -218,7 +218,7 @@
                     </constraints>
                     <properties>
                       <font size="16" style="1"/>
-                      <text value="View and manage attendee registrations and track attendance"/>
+                      <text value="Manage Registrations and Attendance"/>
                     </properties>
                   </component>
                 </children>

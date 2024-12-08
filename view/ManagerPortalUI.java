@@ -530,11 +530,13 @@ public class ManagerPortalUI extends JFrame {
 
         List<AttendeeDTO> filteredAttendees = attendeeService.searchAttendees(query);
         for (AttendeeDTO attendee : filteredAttendees) {
+            String attendanceSummary = attendee.getAttendedSessions().size() + "/" +
+                    attendeeService.getAttendeeSchedule(attendee.getAttendeeID()).getSessionsIDs().size();
             attendeeTableModel.addRow(new Object[]{
                     attendee.getAttendeeID(),
                     attendee.getName(),
                     attendee.getEmail(),
-                    attendee.getPersonalizedScheduleID()
+                    attendanceSummary
             });
         }
     }
