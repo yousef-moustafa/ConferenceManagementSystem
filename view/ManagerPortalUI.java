@@ -1,21 +1,19 @@
 package view;
 
-import model.domain.FeedbackReport;
+import controller.ManagerController;
 import model.domain.enums.SessionStatus;
-import model.dto.AttendeeDTO;
-import model.dto.FeedbackDTO;
 import model.dto.SessionDTO;
+import model.dto.SpeakerDTO;
 import model.dto.SpeakerDTO;
 import model.repository.UserRepository;
 import model.service.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.io.IOException;
 import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,57 +40,43 @@ public class ManagerPortalUI extends JFrame {
     private JButton issueCertificatesButton;
     private JButton logoutButton;
 
+    private ManagerController controller;
+
     public ManagerPortalUI() {
         setContentPane(ManagerPortalUI);
         setTitle("Manager Portal");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Initialize table models with ID columns
         DefaultTableModel speakerTableModel = new DefaultTableModel(
                 new String[]{"ID", "Name", "Email", "Bio"}, 0
         );
         speakerTable.setModel(speakerTableModel);
-
-        // Hide the ID column in the speaker table
-        speakerTable.getColumnModel().getColumn(0).setMinWidth(0);
-        speakerTable.getColumnModel().getColumn(0).setMaxWidth(0);
-        speakerTable.getColumnModel().getColumn(0).setPreferredWidth(0);
+        hideIDColumn(speakerTable);
 
         DefaultTableModel sessionTableModel = new DefaultTableModel(
                 new String[]{"ID", "Title", "Speaker", "Date", "Time", "Room", "Capacity", "Status"}, 0
         );
         sessionTable.setModel(sessionTableModel);
-
-        // Hide the ID column in the session table
-        sessionTable.getColumnModel().getColumn(0).setMinWidth(0);
-        sessionTable.getColumnModel().getColumn(0).setMaxWidth(0);
-        sessionTable.getColumnModel().getColumn(0).setPreferredWidth(0);
+        hideIDColumn(sessionTable);
 
         DefaultTableModel attendeeTableModel = new DefaultTableModel(
                 new String[]{"ID", "Name", "Email", "Sessions Attended"}, 0
         );
         attendeeTable.setModel(attendeeTableModel);
-
-        // Hide the ID column in the attendee table
-        attendeeTable.getColumnModel().getColumn(0).setMinWidth(0);
-        attendeeTable.getColumnModel().getColumn(0).setMaxWidth(0);
-        attendeeTable.getColumnModel().getColumn(0).setPreferredWidth(0);
+        hideIDColumn(attendeeTable);
 
         DefaultTableModel sessionAttendeesTableModel = new DefaultTableModel(
                 new String[]{"ID", "Name", "Email", "Attended"}, 0
         ) {
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                if (columnIndex == 3) { // "Attended" column
-                    return Boolean.class;
-                }
-                return String.class;
+                return columnIndex == 3 ? Boolean.class : String.class;
             }
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 3; // Only "Attended" column is editable
+                return column == 3;
             }
         };
         sessionAttendeesTable.setModel(sessionAttendeesTableModel);
@@ -102,6 +86,7 @@ public class ManagerPortalUI extends JFrame {
         );
         feedbackTable.setModel(feedbackTableModel);
 
+        // Initialize services
         SpeakerService speakerService = new SpeakerService();
         SessionService sessionService = new SessionService();
         FeedbackService feedbackService = new FeedbackService();
@@ -109,123 +94,66 @@ public class ManagerPortalUI extends JFrame {
         CertificateService certificateService = new CertificateService(attendeeService);
         AuthService authService = new AuthService(new UserRepository());
 
-        loadSpeakers(speakerTableModel, speakerService);
-        loadSessions(sessionTableModel, sessionService, speakerService);
-        loadAttendees(attendeeTableModel, attendeeService);
+        // Initialize controller
+        controller = new ManagerController(
+                speakerService,
+                sessionService,
+                feedbackService,
+                attendeeService,
+                certificateService,
+                authService
+        );
 
-        // Load sessions into combo box when tab is switched to process registration
+        // Initial load
+        controller.loadSpeakers(speakerTableModel);
+        controller.loadSessions(sessionTableModel);
+        controller.loadAttendees(attendeeTableModel);
+
         tabbedPane1.addChangeListener(e -> {
             if (tabbedPane1.getSelectedIndex() == 1) {
-                loadSessionsIntoComboBox(sessionComboBox, sessionService);
+                controller.loadSessionsIntoComboBox(sessionComboBox);
             }
-            if (tabbedPane1.getSelectedIndex() == 2) { // Assuming 3rd tab index is 2
-                loadFeedbackTable(feedbackTableModel, feedbackService);
-                updateAverageFeedbackLabel(averageFeedbackLabel, feedbackService);
+            if (tabbedPane1.getSelectedIndex() == 2) {
+                controller.loadFeedbackTable(feedbackTableModel);
+                var report = controller.getConferenceFeedbackAnalysis();
+                String avgRating = String.format("%.2f", report.getAverageRating());
+                averageFeedbackLabel.setText("Total Responses: " + report.getTotalResponses() +
+                        " | Average Feedback Rating: " + avgRating);
             }
         });
 
-        addSpeakerButton.addActionListener(e -> addSpeaker(speakerTableModel, speakerService));
-        editSpeakerButton.addActionListener(e -> editSpeaker(speakerTableModel, speakerService));
-        deleteSpeakerButton.addActionListener(e -> deleteSpeaker(speakerTableModel, speakerService));
+        addSpeakerButton.addActionListener(e -> handleAddSpeaker(speakerTableModel));
+        editSpeakerButton.addActionListener(e -> handleEditSpeaker(speakerTableModel));
+        deleteSpeakerButton.addActionListener(e -> handleDeleteSpeaker(speakerTableModel));
 
-        addSessionButton.addActionListener(e -> addSession(sessionTableModel, sessionService, speakerService));
-        editSessionButton.addActionListener(e -> editSession(sessionTableModel, sessionService, speakerService));
-        deleteSessionButton.addActionListener(e -> deleteSession(sessionTableModel, sessionService, speakerService));
+        addSessionButton.addActionListener(e -> handleAddSession(sessionTableModel));
+        editSessionButton.addActionListener(e -> handleEditSession(sessionTableModel));
+        deleteSessionButton.addActionListener(e -> handleDeleteSession(sessionTableModel));
 
         searchButton.addActionListener(e -> {
-            if (searchField.getText().trim().isEmpty()) loadAttendees(attendeeTableModel, attendeeService);
-            else searchAttendees(attendeeTableModel, attendeeService, searchField.getText().trim());
+            String query = searchField.getText().trim();
+            if (query.isEmpty()) controller.loadAttendees(attendeeTableModel);
+            else controller.searchAttendees(attendeeTableModel, query);
         });
 
         sessionComboBox.addActionListener(e -> {
             String selectedSession = (String) sessionComboBox.getSelectedItem();
             if (selectedSession != null) {
-                String sessionID = selectedSession.split(":")[0]; // Extract session ID
-                loadAttendeesForSession(sessionAttendeesTableModel, sessionService, sessionID);
+                String sessionID = selectedSession.split(":")[0];
+                controller.loadAttendeesForSession(sessionAttendeesTableModel, sessionID);
             }
         });
 
-        markAttendanceButton.addActionListener(e -> {
-            markAttendanceForSelectedSession(sessionAttendeesTableModel, sessionService, attendeeService);
-            loadAttendees(attendeeTableModel, attendeeService); // Fully reload the attendee table
-        });
-        issueCertificatesButton.addActionListener(e -> issueCertificatesForDisplayedAttendees(certificateService));
+        markAttendanceButton.addActionListener(e -> handleMarkAttendance(sessionAttendeesTableModel, attendeeTableModel));
 
-        exportFeedbackReportButton.addActionListener(e -> exportFeedbackReport(feedbackService));
-        logoutButton.addActionListener(e -> handleLogout(authService));
+        issueCertificatesButton.addActionListener(e -> handleIssueCertificates());
+
+        exportFeedbackReportButton.addActionListener(e -> handleExportFeedbackReport());
+
+        logoutButton.addActionListener(e -> handleLogout());
     }
 
-    private void loadSpeakers(DefaultTableModel speakerTableModel, SpeakerService speakerService) {
-        speakerTableModel.setRowCount(0);
-
-        List<SpeakerDTO> speakers = speakerService.getAllSpeakers();
-        for (SpeakerDTO speaker : speakers) {
-            speakerTableModel.addRow(new Object[]{
-                    speaker.getSpeakerID(),
-                    speaker.getName(),
-                    speaker.getEmail(),
-                    speaker.getBio()
-            });
-        }
-    }
-
-    private void loadSessions(DefaultTableModel sessionTableModel, SessionService sessionService, SpeakerService speakerService) {
-        sessionTableModel.setRowCount(0);
-
-        List<SessionDTO> sessions = sessionService.getAllSessions();
-
-        for (SessionDTO session : sessions) {
-            String speakerName = "";
-            if (session.getSpeakerID() != null) {
-                SpeakerDTO speaker = speakerService.getSpeakerProfile(session.getSpeakerID());
-                if (speaker != null) {
-                    speakerName = speaker.getName();
-                }
-            }
-            sessionTableModel.addRow(new Object[]{
-                    session.getSessionID(),
-                    session.getSessionName(),
-                    speakerName,
-                    session.getDate(),
-                    session.getTime(),
-                    session.getRoom(),
-                    session.getCapacity(),
-                    session.getStatus().toString()
-            });
-        }
-    }
-
-    private void loadAttendees(DefaultTableModel attendeeTableModel, AttendeeService attendeeService) {
-        attendeeTableModel.setRowCount(0);
-
-        List<AttendeeDTO> attendees = attendeeService.getAllAttendees();
-        for (AttendeeDTO attendee : attendees) {
-            String attendanceSummary = attendee.getAttendedSessions().size() + "/" + attendeeService.getAttendeeSchedule(attendee.getAttendeeID()).getSessionsIDs().size();
-            attendeeTableModel.addRow(new Object[]{
-                    attendee.getAttendeeID(),
-                    attendee.getName(),
-                    attendee.getEmail(),
-                    attendanceSummary
-            });
-        }
-    }
-
-    private void loadFeedbackTable(DefaultTableModel feedbackTableModel, FeedbackService feedbackService) {
-        feedbackTableModel.setRowCount(0);
-
-        List<FeedbackDTO> feedbackDTOs = feedbackService.getAllFeedback();
-        for (FeedbackDTO feedback : feedbackDTOs) {
-            feedbackTableModel.addRow(new Object[]{
-                    feedback.getFeedbackID(),
-                    feedback.getAttendeeID(),
-                    feedback.getType(),
-                    feedback.getDetails()
-            });
-        }
-    }
-
-
-    private void addSpeaker(DefaultTableModel speakerTableModel, SpeakerService speakerService) {
+    private void handleAddSpeaker(DefaultTableModel speakerTableModel) {
         JTextField nameField = new JTextField();
         JTextField emailField = new JTextField();
         JPasswordField passwordField = new JPasswordField();
@@ -233,27 +161,17 @@ public class ManagerPortalUI extends JFrame {
         JScrollPane bioScrollPane = new JScrollPane(bioArea);
 
         Object[] fields = {"Name:", nameField, "Email:", emailField, "Password:", passwordField, "Bio:", bioScrollPane};
-
         int result = JOptionPane.showConfirmDialog(null, fields, "Add Speaker", JOptionPane.OK_CANCEL_OPTION);
 
         if (result == JOptionPane.OK_OPTION) {
             try {
-                String name = nameField.getText().trim();
-                String email = emailField.getText().trim();
-                String password = new String(passwordField.getPassword()).trim();
-                String bio = bioArea.getText().trim();
-
                 SpeakerDTO newSpeaker = new SpeakerDTO();
-                newSpeaker.setName(name);
-                newSpeaker.setEmail(email);
-                newSpeaker.setBio(bio);
+                newSpeaker.setName(nameField.getText().trim());
+                newSpeaker.setEmail(emailField.getText().trim());
+                newSpeaker.setBio(bioArea.getText().trim());
                 newSpeaker.setAssociatedSessionIDs(new ArrayList<>());
 
-                String speakerID = speakerService.createSpeaker(newSpeaker, password);
-
-                // Reload speakers to update the table
-                loadSpeakers(speakerTableModel, speakerService);
-
+                String speakerID = controller.addSpeaker(newSpeaker, new String(passwordField.getPassword()).trim(), speakerTableModel);
                 JOptionPane.showMessageDialog(null, "Speaker added successfully! ID: " + speakerID);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, "Failed to add speaker: " + ex.getMessage());
@@ -261,7 +179,7 @@ public class ManagerPortalUI extends JFrame {
         }
     }
 
-    private void editSpeaker(DefaultTableModel speakerTableModel, SpeakerService speakerService) {
+    private void handleEditSpeaker(DefaultTableModel speakerTableModel) {
         int selectedRow = speakerTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(null, "Please select a speaker to edit.");
@@ -269,8 +187,7 @@ public class ManagerPortalUI extends JFrame {
         }
 
         String speakerID = speakerTableModel.getValueAt(selectedRow, 0).toString();
-
-        SpeakerDTO speaker = speakerService.getSpeakerProfile(speakerID);
+        SpeakerDTO speaker = controller.getSpeakerProfile(speakerID);
         if (speaker == null) {
             JOptionPane.showMessageDialog(null, "Speaker not found.");
             return;
@@ -281,22 +198,11 @@ public class ManagerPortalUI extends JFrame {
         JScrollPane bioScrollPane = new JScrollPane(bioArea);
 
         Object[] fields = {"Name:", nameField, "Bio:", bioScrollPane};
-
         int result = JOptionPane.showConfirmDialog(null, fields, "Edit Speaker", JOptionPane.OK_CANCEL_OPTION);
 
         if (result == JOptionPane.OK_OPTION) {
             try {
-                String updatedName = nameField.getText().trim();
-                String updatedBio = bioArea.getText().trim();
-
-                speaker.setName(updatedName);
-                speaker.setBio(updatedBio);
-
-                speakerService.updateSpeakerProfile(speaker.getSpeakerID(), updatedName, updatedBio);
-
-                // Reload speakers to update the table
-                loadSpeakers(speakerTableModel, speakerService);
-
+                controller.updateSpeakerProfile(speaker.getSpeakerID(), nameField.getText().trim(), bioArea.getText().trim(), speakerTableModel);
                 JOptionPane.showMessageDialog(null, "Speaker updated successfully!");
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, "Failed to update speaker: " + ex.getMessage());
@@ -304,7 +210,7 @@ public class ManagerPortalUI extends JFrame {
         }
     }
 
-    private void deleteSpeaker(DefaultTableModel speakerTableModel, SpeakerService speakerService) {
+    private void handleDeleteSpeaker(DefaultTableModel speakerTableModel) {
         int selectedRow = speakerTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(null, "Please select a speaker to delete.");
@@ -312,17 +218,12 @@ public class ManagerPortalUI extends JFrame {
         }
 
         String speakerID = speakerTableModel.getValueAt(selectedRow, 0).toString();
-
         int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this speaker?",
                 "Confirm Deletion", JOptionPane.YES_NO_OPTION);
 
         if (result == JOptionPane.YES_OPTION) {
             try {
-                speakerService.deleteSpeaker(speakerID);
-
-                // Reload speakers to update the table
-                loadSpeakers(speakerTableModel, speakerService);
-
+                controller.deleteSpeaker(speakerID, speakerTableModel);
                 JOptionPane.showMessageDialog(null, "Speaker deleted successfully!");
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, "Failed to delete speaker: " + ex.getMessage());
@@ -330,18 +231,15 @@ public class ManagerPortalUI extends JFrame {
         }
     }
 
-    private void addSession(DefaultTableModel sessionTableModel, SessionService sessionService, SpeakerService speakerService) {
+    private void handleAddSession(DefaultTableModel sessionTableModel) {
         JTextField sessionNameField = new JTextField();
         JTextField dateField = new JTextField("YYYY-MM-DD");
         JTextField timeField = new JTextField("HH:MM");
         JTextField roomField = new JTextField();
         JTextField capacityField = new JTextField();
 
-        // Fetch speaker names and IDs
-        List<SpeakerDTO> speakers = speakerService.getAllSpeakers();
-        JComboBox<String> speakerComboBox = new JComboBox<>(speakers.stream()
-                .map(SpeakerDTO::getName)
-                .toArray(String[]::new));
+        List<SpeakerDTO> speakers = controller.getAllSpeakers();
+        JComboBox<String> speakerComboBox = new JComboBox<>(speakers.stream().map(SpeakerDTO::getName).toArray(String[]::new));
 
         Object[] fields = {
                 "Session Name:", sessionNameField,
@@ -363,20 +261,16 @@ public class ManagerPortalUI extends JFrame {
                 int capacity = Integer.parseInt(capacityField.getText().trim());
                 String speakerName = (String) speakerComboBox.getSelectedItem();
 
-                // Find the speaker ID by matching the name
+                // Find speaker ID
                 String speakerID = null;
-                for (SpeakerDTO speaker : speakers) {
-                    if (speaker.getName().equals(speakerName)) {
-                        speakerID = speaker.getSpeakerID();
+                for (SpeakerDTO s : speakers) {
+                    if (s.getName().equals(speakerName)) {
+                        speakerID = s.getSpeakerID();
                         break;
                     }
                 }
+                if (speakerID == null) throw new Exception("Speaker not found.");
 
-                if (speakerID == null) {
-                    throw new Exception("Speaker not found.");
-                }
-
-                // Create a new SessionDTO
                 SessionDTO newSession = new SessionDTO();
                 newSession.setSessionName(name);
                 newSession.setSpeakerID(speakerID);
@@ -386,32 +280,15 @@ public class ManagerPortalUI extends JFrame {
                 newSession.setCapacity(capacity);
                 newSession.setStatus(SessionStatus.SCHEDULED);
 
-                // Save the new session via the service
-                String sessionID = sessionService.createSession(newSession);
-                newSession.setSessionID(sessionID);
-
-                sessionTableModel.addRow(new Object[]{
-                        sessionID,
-                        newSession.getSessionName(),
-                        speakerName,
-                        newSession.getDate(),
-                        newSession.getTime(),
-                        newSession.getRoom(),
-                        newSession.getCapacity(),
-                        newSession.getStatus().toString()
-                });
-
+                controller.addSession(newSession, speakerName, sessionTableModel);
                 JOptionPane.showMessageDialog(null, "Session added successfully!");
-            } catch (IllegalArgumentException ex) {
-                JOptionPane.showMessageDialog(null, "Failed to add session: " + ex.getMessage());
             } catch (Exception ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(null, "An unexpected error occurred: " + ex.getMessage());
+                JOptionPane.showMessageDialog(null, "Failed to add session: " + ex.getMessage());
             }
         }
     }
 
-    private void editSession(DefaultTableModel sessionTableModel, SessionService sessionService, SpeakerService speakerService) {
+    private void handleEditSession(DefaultTableModel sessionTableModel) {
         int selectedRow = sessionTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(null, "Please select a session to edit.");
@@ -419,32 +296,27 @@ public class ManagerPortalUI extends JFrame {
         }
 
         String sessionID = sessionTableModel.getValueAt(selectedRow, 0).toString();
-
-        SessionDTO session = sessionService.getSession(sessionID);
+        SessionDTO session = controller.getSession(sessionID);
         if (session == null) {
             JOptionPane.showMessageDialog(null, "Session not found.");
             return;
         }
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String formattedDate = dateFormat.format(session.getDate());
-
         JTextField sessionNameField = new JTextField(session.getSessionName());
-        JTextField dateField = new JTextField(formattedDate); // Use formatted date
+        JTextField dateField = new JTextField(session.getDate().toString());
         JTextField timeField = new JTextField(session.getTime().toString());
         JTextField roomField = new JTextField(session.getRoom());
         JTextField capacityField = new JTextField(String.valueOf(session.getCapacity()));
 
-        // Fetch speaker names and IDs
-        List<SpeakerDTO> speakers = speakerService.getAllSpeakers();
-        JComboBox<String> speakerComboBox = new JComboBox<>(speakers.stream()
-                .map(SpeakerDTO::getName)
-                .toArray(String[]::new));
+        List<SpeakerDTO> speakers = controller.getAllSpeakers();
+        JComboBox<String> speakerComboBox = new JComboBox<>(speakers.stream().map(SpeakerDTO::getName).toArray(String[]::new));
 
-        // Set the selected speaker in the combo box
-        SpeakerDTO currentSpeaker = speakerService.getSpeakerProfile(session.getSpeakerID());
-        if (currentSpeaker != null) {
-            speakerComboBox.setSelectedItem(currentSpeaker.getName());
+        // Set current speaker in combo box
+        for (SpeakerDTO sp : speakers) {
+            if (sp.getSpeakerID().equals(session.getSpeakerID())) {
+                speakerComboBox.setSelectedItem(sp.getName());
+                break;
+            }
         }
 
         Object[] fields = {
@@ -457,70 +329,46 @@ public class ManagerPortalUI extends JFrame {
         };
 
         int result = JOptionPane.showConfirmDialog(null, fields, "Edit Session", JOptionPane.OK_CANCEL_OPTION);
-
         if (result == JOptionPane.OK_OPTION) {
             try {
-                String updatedName = sessionNameField.getText().trim();
-                Date updatedDate = Date.valueOf(dateField.getText().trim());
-                LocalTime updatedTime = LocalTime.parse(timeField.getText().trim());
-                String updatedRoom = roomField.getText().trim();
-                int updatedCapacity = Integer.parseInt(capacityField.getText().trim());
-                String updatedSpeakerName = (String) speakerComboBox.getSelectedItem();
+                session.setSessionName(sessionNameField.getText().trim());
+                session.setDate(Date.valueOf(dateField.getText().trim()));
+                session.setTime(LocalTime.parse(timeField.getText().trim()));
+                session.setRoom(roomField.getText().trim());
+                session.setCapacity(Integer.parseInt(capacityField.getText().trim()));
 
-                // Find the updated speaker ID by matching the name
+                String updatedSpeakerName = (String) speakerComboBox.getSelectedItem();
                 String updatedSpeakerID = null;
-                for (SpeakerDTO speaker : speakers) {
-                    if (speaker.getName().equals(updatedSpeakerName)) {
-                        updatedSpeakerID = speaker.getSpeakerID();
+                for (SpeakerDTO s : speakers) {
+                    if (s.getName().equals(updatedSpeakerName)) {
+                        updatedSpeakerID = s.getSpeakerID();
                         break;
                     }
                 }
-
-                if (updatedSpeakerID == null) {
-                    throw new Exception("Speaker not found.");
-                }
-
-                // Update the session DTO
-                session.setSessionName(updatedName);
-                session.setDate(updatedDate);
-                session.setTime(updatedTime);
-                session.setRoom(updatedRoom);
-                session.setCapacity(updatedCapacity);
+                if (updatedSpeakerID == null) throw new Exception("Speaker not found.");
                 session.setSpeakerID(updatedSpeakerID);
 
-                // Save the updated session
-                sessionService.updateSession(session);
-
-                // Reload sessions to reflect changes
-                loadSessions(sessionTableModel, sessionService, speakerService);
-
+                controller.updateSession(session, sessionTableModel);
                 JOptionPane.showMessageDialog(null, "Session updated successfully!");
             } catch (Exception ex) {
-                ex.printStackTrace(); // This will show the full stack trace in the console
                 JOptionPane.showMessageDialog(null, "Failed to update session: " + ex.getMessage());
             }
         }
     }
 
-    private void deleteSession(DefaultTableModel sessionTableModel, SessionService sessionService, SpeakerService speakerService) {
+    private void handleDeleteSession(DefaultTableModel sessionTableModel) {
         int selectedRow = sessionTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(null, "Please select a session to delete.");
             return;
         }
-
         String sessionID = sessionTableModel.getValueAt(selectedRow, 0).toString();
 
         int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this session?",
                 "Confirm Deletion", JOptionPane.YES_NO_OPTION);
-
         if (result == JOptionPane.YES_OPTION) {
             try {
-                sessionService.deleteSession(sessionID);
-
-                // Reload sessions to update the table
-                loadSessions(sessionTableModel, sessionService, speakerService);
-
+                controller.deleteSession(sessionID, sessionTableModel);
                 JOptionPane.showMessageDialog(null, "Session deleted successfully!");
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, "Failed to delete session: " + ex.getMessage());
@@ -528,106 +376,59 @@ public class ManagerPortalUI extends JFrame {
         }
     }
 
-    private void searchAttendees(DefaultTableModel attendeeTableModel, AttendeeService attendeeService, String query) {
-        attendeeTableModel.setRowCount(0);
-
-        List<AttendeeDTO> filteredAttendees = attendeeService.searchAttendees(query);
-        for (AttendeeDTO attendee : filteredAttendees) {
-            String attendanceSummary = attendee.getAttendedSessions().size() + "/" +
-                    attendeeService.getAttendeeSchedule(attendee.getAttendeeID()).getSessionsIDs().size();
-            attendeeTableModel.addRow(new Object[]{
-                    attendee.getAttendeeID(),
-                    attendee.getName(),
-                    attendee.getEmail(),
-                    attendanceSummary
-            });
-        }
-    }
-
-    private void loadSessionsIntoComboBox(JComboBox<String> sessionComboBox, SessionService sessionService) {
-        sessionComboBox.removeAllItems();
-
-        List<SessionDTO> sessions = sessionService.getAllSessions(); // Fetch all sessions
-        for (SessionDTO session : sessions) {
-            sessionComboBox.addItem(session.getSessionID() + ": " + session.getSessionName());
-        }
-    }
-
-    private void loadAttendeesForSession(DefaultTableModel sessionAttendeesTableModel, SessionService sessionService, String sessionID) {
-        sessionAttendeesTableModel.setRowCount(0);
-
-        List<AttendeeDTO> attendees = sessionService.getSessionAttendees(sessionID);
-        Map<String, Boolean> attendanceMap = sessionService.getSession(sessionID).getAttendeeAttendance();
-        for (AttendeeDTO attendee : attendees) {
-            Boolean attended = attendanceMap.getOrDefault(attendee.getAttendeeID(), false);
-            sessionAttendeesTableModel.addRow(new Object[]{
-                    attendee.getAttendeeID(),
-                    attendee.getName(),
-                    attendee.getEmail(),
-                    attended
-            });
-        }
-    }
-
-    private void markAttendanceForSelectedSession(DefaultTableModel sessionAttendeesTableModel, SessionService sessionService, AttendeeService attendeeService) {
+    private void handleMarkAttendance(DefaultTableModel sessionAttendeesTableModel, DefaultTableModel attendeeTableModel) {
         String selectedSession = (String) sessionComboBox.getSelectedItem();
         if (selectedSession == null) {
             JOptionPane.showMessageDialog(this, "Please select a session.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        String sessionID = selectedSession.split(":")[0]; // Extract session ID
-
-        // Ensure at least one attendee is selected
+        String sessionID = selectedSession.split(":")[0];
         int[] selectedRows = sessionAttendeesTable.getSelectedRows();
         if (selectedRows.length == 0) {
             JOptionPane.showMessageDialog(this, "Please select at least one attendee to mark attendance.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Collect attendance data
+        Map<String, Boolean> attendanceMap = new HashMap<>();
+        for (int row : selectedRows) {
+            String attendeeID = (String) sessionAttendeesTableModel.getValueAt(row, 0);
+            Boolean attended = (Boolean) sessionAttendeesTableModel.getValueAt(row, 3);
+            attendanceMap.put(attendeeID, attended);
+        }
+
         try {
-            for (int row : selectedRows) {
-                String attendeeID = (String) sessionAttendeesTableModel.getValueAt(row, 0); // Get attendee ID from the first column
-                Boolean attended = (Boolean) sessionAttendeesTableModel.getValueAt(row, 3);
-
-                // Call AttendeeService to update attendance
-                attendeeService.markAttendance(attendeeID, sessionID, attended);
-            }
-
-            // Show success message
+            controller.markAttendanceForSelectedSession(sessionID, new ArrayList<>(attendanceMap.keySet()), attendanceMap, sessionAttendeesTableModel);
+            controller.loadAttendees(attendeeTableModel);
             JOptionPane.showMessageDialog(this, "Attendance marked successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-
-            // Optionally refresh the table or UI
-            loadAttendeesForSession(sessionAttendeesTableModel, sessionService, sessionID);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "An error occurred while marking attendance: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void updateAverageFeedbackLabel(JLabel averageFeedbackLabel, FeedbackService feedbackService) {
-        FeedbackReport report = feedbackService.getConferenceFeedbackAnalysis();
-        String averageRating = String.format("%.2f", report.getAverageRating());
-        int totalResponses = report.getTotalResponses();
-
-        averageFeedbackLabel.setText("Total Responses: " + totalResponses + " | Average Feedback Rating: " + averageRating);
+    private void handleIssueCertificates() {
+        try {
+            List<String> attendeeIDs = getDisplayedAttendeeIDs();
+            if (attendeeIDs.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No attendees to process.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            List<String> issuedCertificates = controller.issueCertificatesForDisplayedAttendees(attendeeIDs);
+            JOptionPane.showMessageDialog(this, issuedCertificates.size() + " certificates issued successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error issuing certificates: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
-    private void exportFeedbackReport(FeedbackService feedbackService) {
-        // Define the output file path
-        String outputPath = "feedback_report.txt"; // Adjust the path if needed
-
+    private void handleExportFeedbackReport() {
+        String outputPath = "feedback_report.txt";
         try {
-            // Call the FeedbackService method to export the report
-            feedbackService.exportFeedbackReport(outputPath);
-
-            // Notify the user about the success
+            controller.exportFeedbackReport(outputPath);
             JOptionPane.showMessageDialog(this,
                     "Feedback report exported successfully to: " + outputPath,
                     "Export Successful",
                     JOptionPane.INFORMATION_MESSAGE);
-        } catch (IOException ex) {
-            // Notify the user about the failure
+        } catch (Exception ex) {
             JOptionPane.showMessageDialog(this,
                     "Error exporting feedback report: " + ex.getMessage(),
                     "Export Failed",
@@ -635,59 +436,33 @@ public class ManagerPortalUI extends JFrame {
         }
     }
 
-    private void issueCertificatesForDisplayedAttendees(CertificateService certificateService) {
-        try {
-            // Get attendee IDs from the attendeeTable
-            List<String> attendeeIDs = getDisplayedAttendeeIDs();
-
-            // Check if there are attendees to process
-            if (attendeeIDs.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "No attendees to process.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            // Call the CertificateService to generate certificates
-            List<String> issuedCertificates = certificateService.generateCertificatesForEligibleAttendees(attendeeIDs, "GAF-AI 2025");
-
-            // Provide feedback to the user
-            JOptionPane.showMessageDialog(this, issuedCertificates.size() + " certificates issued successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-
-        } catch (Exception ex) {
-            // Handle errors and show an error message
-            JOptionPane.showMessageDialog(this, "Error issuing certificates: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    // Helper method to retrieve attendee IDs from the attendeeTable
-    private List<String> getDisplayedAttendeeIDs() {
-        List<String> attendeeIDs = new ArrayList<>();
-        for (int row = 0; row < attendeeTable.getRowCount(); row++) {
-            String attendeeID = (String) attendeeTable.getValueAt(row, 0); // Retrieve ID from column 0
-            attendeeIDs.add(attendeeID);
-        }
-        return attendeeIDs;
-    }
-
-    private void handleLogout(AuthService authService) {
-        // Show a confirmation dialog
+    private void handleLogout() {
         int confirm = JOptionPane.showConfirmDialog(
                 this,
                 "Are you sure you want to log out?",
                 "Confirm Logout",
                 JOptionPane.YES_NO_OPTION
         );
-
-        // Proceed only if the user confirms
         if (confirm == JOptionPane.YES_OPTION) {
-            // Call AuthService to log out
-            authService.logout();
-
-            // Redirect to Login screen
+            controller.logout();
             Login loginScreen = new Login();
             loginScreen.setVisible(true);
-
-            // Close the current UI
             this.dispose();
         }
+    }
+
+    private List<String> getDisplayedAttendeeIDs() {
+        List<String> attendeeIDs = new ArrayList<>();
+        for (int row = 0; row < attendeeTable.getRowCount(); row++) {
+            String attendeeID = (String) attendeeTable.getValueAt(row, 0);
+            attendeeIDs.add(attendeeID);
+        }
+        return attendeeIDs;
+    }
+
+    private void hideIDColumn(JTable table) {
+        table.getColumnModel().getColumn(0).setMinWidth(0);
+        table.getColumnModel().getColumn(0).setMaxWidth(0);
+        table.getColumnModel().getColumn(0).setPreferredWidth(0);
     }
 }
