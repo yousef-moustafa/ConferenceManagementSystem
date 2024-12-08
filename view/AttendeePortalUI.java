@@ -4,6 +4,7 @@ import model.domain.PersonalizedSchedule;
 import model.dto.CertificateDTO;
 import model.dto.SessionDTO;
 import model.dto.SpeakerDTO;
+import model.repository.UserRepository;
 import model.service.*;
 
 import javax.swing.*;
@@ -31,6 +32,7 @@ public class AttendeePortalUI extends JFrame {
     private JLabel certificateHeaderLabel;
     private JLabel noCertificateLabel;
     private JTextArea certificateDetails;
+    private JButton logoutButton;
 
     public AttendeePortalUI(String attendeeID, String attendeeName) {
         setContentPane(AttendeePortalUI);
@@ -83,6 +85,7 @@ public class AttendeePortalUI extends JFrame {
 
         AttendeeService attendeeService = new AttendeeService(sessionService, feedbackService);
         CertificateService certificateService = new CertificateService(attendeeService);
+        AuthService authService = new AuthService(new UserRepository());
 
         loadConferenceSchedule(conferenceScheduleTableModel, sessionService, speakerService);
         loadPersonalizedSchedule(personalizedScheduleTableModel, attendeeID, attendeeService, sessionService, speakerService);
@@ -125,6 +128,8 @@ public class AttendeePortalUI extends JFrame {
             commentTextArea.setText("");    // Clear comment area
             JOptionPane.showMessageDialog(this, "Feedback fields cleared.", "Info", JOptionPane.INFORMATION_MESSAGE);
         });
+
+        logoutButton.addActionListener(e -> handleLogout(authService));
 
     }
 
@@ -273,6 +278,29 @@ public class AttendeePortalUI extends JFrame {
             certificateDetails.setVisible(false);
 
             noCertificateLabel.setText("<html>Manager has not sent you a certificate.<br>Make sure you have attended all sessions before the conference ends.</html>");
+        }
+    }
+
+    private void handleLogout(AuthService authService) {
+        // Show a confirmation dialog
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to log out?",
+                "Confirm Logout",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        // Proceed only if the user confirms
+        if (confirm == JOptionPane.YES_OPTION) {
+            // Call AuthService to log out
+            authService.logout();
+
+            // Redirect to Login screen
+            Login loginScreen = new Login();
+            loginScreen.setVisible(true);
+
+            // Close the current UI
+            this.dispose();
         }
     }
 

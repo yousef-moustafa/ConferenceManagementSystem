@@ -6,6 +6,7 @@ import model.dto.AttendeeDTO;
 import model.dto.FeedbackDTO;
 import model.dto.SessionDTO;
 import model.dto.SpeakerDTO;
+import model.repository.UserRepository;
 import model.service.*;
 
 import javax.swing.*;
@@ -39,6 +40,7 @@ public class ManagerPortalUI extends JFrame {
     private JTable sessionAttendeesTable;
     private JLabel averageFeedbackLabel;
     private JButton issueCertificatesButton;
+    private JButton logoutButton;
 
     public ManagerPortalUI() {
         setContentPane(ManagerPortalUI);
@@ -105,6 +107,7 @@ public class ManagerPortalUI extends JFrame {
         FeedbackService feedbackService = new FeedbackService();
         AttendeeService attendeeService = new AttendeeService(sessionService, feedbackService);
         CertificateService certificateService = new CertificateService(attendeeService);
+        AuthService authService = new AuthService(new UserRepository());
 
         loadSpeakers(speakerTableModel, speakerService);
         loadSessions(sessionTableModel, sessionService, speakerService);
@@ -149,6 +152,7 @@ public class ManagerPortalUI extends JFrame {
         issueCertificatesButton.addActionListener(e -> issueCertificatesForDisplayedAttendees(certificateService));
 
         exportFeedbackReportButton.addActionListener(e -> exportFeedbackReport(feedbackService));
+        logoutButton.addActionListener(e -> handleLogout(authService));
     }
 
     private void loadSpeakers(DefaultTableModel speakerTableModel, SpeakerService speakerService) {
@@ -662,5 +666,28 @@ public class ManagerPortalUI extends JFrame {
             attendeeIDs.add(attendeeID);
         }
         return attendeeIDs;
+    }
+
+    private void handleLogout(AuthService authService) {
+        // Show a confirmation dialog
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to log out?",
+                "Confirm Logout",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        // Proceed only if the user confirms
+        if (confirm == JOptionPane.YES_OPTION) {
+            // Call AuthService to log out
+            authService.logout();
+
+            // Redirect to Login screen
+            Login loginScreen = new Login();
+            loginScreen.setVisible(true);
+
+            // Close the current UI
+            this.dispose();
+        }
     }
 }

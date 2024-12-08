@@ -2,6 +2,8 @@ package view;
 
 import model.dto.SessionDTO;
 import model.dto.SpeakerDTO;
+import model.repository.UserRepository;
+import model.service.AuthService;
 import model.service.SessionService;
 import model.service.SpeakerService;
 
@@ -19,6 +21,7 @@ public class SpeakerPortalUI extends JFrame {
     private JTextArea speakerBio;
     private JButton saveBioButton;
     private JLabel statusBar;
+    private JButton logoutButton;
 
     public SpeakerPortalUI(String speakerID, String speakerName) {
         setContentPane(SpeakerPortalUI);
@@ -47,6 +50,7 @@ public class SpeakerPortalUI extends JFrame {
         speakerSessionsTable.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
 
         SpeakerService speakerService = new SpeakerService();
+        AuthService authService = new AuthService(new UserRepository());
 
         // Load sessions for the logged-in speaker
         loadSpeakerSessions(speakerSessionTableModel, speakerService, speakerID);
@@ -57,6 +61,7 @@ public class SpeakerPortalUI extends JFrame {
 
         viewSessionDetailsButton.addActionListener(e -> viewSessionDetails((DefaultTableModel) speakerSessionsTable.getModel()));
         saveBioButton.addActionListener(e -> saveSpeakerBio(speakerID, new SpeakerService()));
+        logoutButton.addActionListener(e -> handleLogout(authService));
     }
 
     private void loadSpeakerSessions(DefaultTableModel sessionTableModel, SpeakerService speakerService, String speakerID) {
@@ -128,6 +133,29 @@ public class SpeakerPortalUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Bio updated successfully!");
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Failed to update bio: " + ex.getMessage());
+        }
+    }
+
+    private void handleLogout(AuthService authService) {
+        // Show a confirmation dialog
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to log out?",
+                "Confirm Logout",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        // Proceed only if the user confirms
+        if (confirm == JOptionPane.YES_OPTION) {
+            // Call AuthService to log out
+            authService.logout();
+
+            // Redirect to Login screen
+            Login loginScreen = new Login();
+            loginScreen.setVisible(true);
+
+            // Close the current UI
+            this.dispose();
         }
     }
 
