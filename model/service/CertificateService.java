@@ -78,13 +78,11 @@ public class CertificateService {
 
         // Check if registeredSessions is empty
         if (registeredSessions.isEmpty()) {
-            System.out.println("Attendee " + attendeeID + " is not registered for any sessions.");
             return false; // Ineligible if attendee is not yet registered to any sessions
         }
 
         // Check if all registered sessions are attended
         boolean eligible = attendedSessions.containsAll(registeredSessions);
-        System.out.println("Attendee " + attendeeID + " eligible: " + eligible);
         return eligible;
     }
 

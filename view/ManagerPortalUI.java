@@ -67,7 +67,7 @@ public class ManagerPortalUI extends JFrame {
         sessionTable.getColumnModel().getColumn(0).setPreferredWidth(0);
 
         DefaultTableModel attendeeTableModel = new DefaultTableModel(
-                new String[]{"ID", "Name", "Email", "Personalized Schedule ID"}, 0
+                new String[]{"ID", "Name", "Email", "Sessions Attended"}, 0
         );
         attendeeTable.setModel(attendeeTableModel);
 
@@ -141,7 +141,10 @@ public class ManagerPortalUI extends JFrame {
             }
         });
 
-        markAttendanceButton.addActionListener(e -> markAttendanceForSelectedSession(sessionAttendeesTableModel, sessionService, attendeeService));
+        markAttendanceButton.addActionListener(e -> {
+            markAttendanceForSelectedSession(sessionAttendeesTableModel, sessionService, attendeeService);
+            loadAttendees(attendeeTableModel, attendeeService); // Fully reload the attendee table
+        });
         issueCertificatesButton.addActionListener(e -> issueCertificatesForDisplayedAttendees(certificateService));
 
         exportFeedbackReportButton.addActionListener(e -> {
@@ -194,11 +197,12 @@ public class ManagerPortalUI extends JFrame {
 
         List<AttendeeDTO> attendees = attendeeService.getAllAttendees();
         for (AttendeeDTO attendee : attendees) {
+            String attendanceSummary = attendee.getAttendedSessions().size() + "/" + attendeeService.getAttendeeSchedule(attendee.getAttendeeID()).getSessionsIDs().size();
             attendeeTableModel.addRow(new Object[]{
                     attendee.getAttendeeID(),
                     attendee.getName(),
                     attendee.getEmail(),
-                    attendee.getPersonalizedScheduleID()
+                    attendanceSummary
             });
         }
     }
