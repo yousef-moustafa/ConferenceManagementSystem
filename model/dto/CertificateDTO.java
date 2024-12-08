@@ -36,4 +36,15 @@ public class CertificateDTO {
                 ", issueDate=" + issueDate +
                 '}';
     }
+
+    public String getDisplayString() {
+        return "\n\n                                         Certificate of Attendance\n\n\n" +
+                "       Certificate ID: " + certificateID + "\n\n" +
+                "       Attendee ID: " + attendeeID + "\n\n" +
+                "       Conference: " + conferenceName + "\n\n" +
+                "       Issue Date: " + issueDate + "\n\n\n\n" +
+                "                                                                             ______________________\n" +
+                "                                                                               Conference Manager";
+    }
+
 }

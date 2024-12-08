@@ -2,6 +2,7 @@ package model.domain;
 
 import model.domain.enums.CertificateStatus;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Certificate {
@@ -12,6 +13,7 @@ public class Certificate {
     private String conferenceName;
     private Date issueDate;
     private CertificateStatus status;
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public Certificate(String attendeeID, String conferenceName, Date issueDate) {
         this.certificateID = generateCertificateID();
@@ -47,11 +49,22 @@ public class Certificate {
         return status;
     }
 
+    // Setters
     public void setStatus(CertificateStatus status) {
         this.status = status;
     }
 
-    public String generateCertificateText() {
-        return "Certificate for " + attendeeID + " from " + conferenceName + "\nIssued on: " + issueDate.toString();
+    public void setCertificateID(String certificateID) {
+        this.certificateID = certificateID;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s, %s, %s, %s, %s",
+                certificateID,
+                attendeeID,
+                conferenceName,
+                dateFormat.format(issueDate),
+                status.name());
     }
 }

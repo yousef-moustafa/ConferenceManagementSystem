@@ -48,13 +48,14 @@ public class CertificateRepository implements Repository<Certificate> {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(", ");
-                if (data.length == 4) {
+                if (data.length == 5) {
                     Certificate certificate = new Certificate(
-                            data[0],
-                            data[1],
-                            dateFormat.parse(data[2])
+                            data[1], // attendeeID
+                            data[2], // conferenceName
+                            dateFormat.parse(data[3]) // Parse issueDate using dateFormat
                     );
-                    certificate.setStatus(CertificateStatus.valueOf(data[3].toUpperCase()));
+                    certificate.setCertificateID(data[0]); // Set certificateID
+                    certificate.setStatus(CertificateStatus.valueOf(data[4].toUpperCase()));
                     certificates.add(certificate);
                 }
             }
@@ -62,15 +63,11 @@ public class CertificateRepository implements Repository<Certificate> {
             throw new RuntimeException("Error loading certificates from file", e);
         }
     }
+
     private void writeToFile() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (Certificate certificate : certificates) {
-                writer.write(String.format("%s, %s, %s, %s, %s",
-                        certificate.getCertificateID(),
-                        certificate.getAttendeeID(),
-                        certificate.getConferenceName(),
-                        dateFormat.format(certificate.getIssueDate()),
-                        certificate.getStatus()));
+                writer.write(certificate.toString());
                 writer.newLine();
             }
         } catch (IOException e) {

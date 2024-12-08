@@ -1,16 +1,15 @@
 package view;
 
 import model.domain.PersonalizedSchedule;
+import model.dto.CertificateDTO;
 import model.dto.SessionDTO;
 import model.dto.SpeakerDTO;
-import model.service.AttendeeService;
-import model.service.SessionService;
-import model.service.SpeakerService;
-import model.service.FeedbackService;
+import model.service.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
@@ -29,6 +28,9 @@ public class AttendeePortalUI extends JFrame {
     private JButton submitFeedbackButton;
     private JLabel conferenceScheduleHeaderLabel;
     private JLabel myScheduleHeaderLabel;
+    private JLabel certificateHeaderLabel;
+    private JLabel noCertificateLabel;
+    private JTextArea certificateDetails;
 
     public AttendeePortalUI(String attendeeID, String attendeeName) {
         setContentPane(AttendeePortalUI);
@@ -80,9 +82,11 @@ public class AttendeePortalUI extends JFrame {
         FeedbackService feedbackService = new FeedbackService();
 
         AttendeeService attendeeService = new AttendeeService(sessionService, feedbackService);
+        CertificateService certificateService = new CertificateService(attendeeService);
 
         loadConferenceSchedule(conferenceScheduleTableModel, sessionService, speakerService);
         loadPersonalizedSchedule(personalizedScheduleTableModel, attendeeID, attendeeService, sessionService, speakerService);
+        initializeCertificateTab(certificateService, attendeeID, attendeeName);
 
         // Update the status bar
         statusBar.setText("Logged in as: " + attendeeName + " | id: " + attendeeID);
@@ -247,6 +251,28 @@ public class AttendeePortalUI extends JFrame {
         } catch (Exception ex) { // Catch generic exceptions
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Submission Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace(); // Optional: Log error details
+        }
+    }
+
+    private void initializeCertificateTab(CertificateService certificateService, String attendeeID, String attendeeName) {
+        try {
+            // Attempt to fetch the certificate for the attendee
+            CertificateDTO certificate = certificateService.getCertificateForAttendee(attendeeID);
+
+            // If the certificate exists, display its details
+            noCertificateLabel.setVisible(false);
+            certificateDetails.setVisible(true);
+            certificateDetails.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+            certificateDetails.setLineWrap(false);
+            certificateDetails.setWrapStyleWord(false);
+
+            certificateDetails.setText(certificate.getDisplayString());
+        } catch (IllegalArgumentException e) {
+            // If no certificate is found, display the appropriate message
+            noCertificateLabel.setVisible(true);
+            certificateDetails.setVisible(false);
+
+            noCertificateLabel.setText("<html>Manager has not sent you a certificate.<br>Make sure you have attended all sessions before the conference ends.</html>");
         }
     }
 
