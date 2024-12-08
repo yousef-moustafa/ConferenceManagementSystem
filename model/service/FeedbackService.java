@@ -8,6 +8,9 @@ import model.dto.FeedbackDTO;
 import model.repository.FeedbackRepository;
 import model.domain.FeedbackReport;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -117,4 +120,27 @@ public class FeedbackService {
 
         return new FeedbackReport(averageRating, totalResponses, commentsSummary);
     }
+
+    public void exportFeedbackReport(String outputPath) throws IOException {
+        // Generate feedback analysis
+        FeedbackReport report = getConferenceFeedbackAnalysis();
+
+        // Prepare the report content
+        StringBuilder reportContent = new StringBuilder();
+        reportContent.append("Conference Feedback Report\n");
+        reportContent.append("==========================\n\n");
+        reportContent.append("Total Responses: ").append(report.getTotalResponses()).append("\n");
+        reportContent.append("Average Rating: ").append(String.format("%.2f", report.getAverageRating())).append("\n\n");
+
+        reportContent.append("Comments Summary:\n");
+        for (String comment : report.getCommentsSummary()) {
+            reportContent.append("- ").append(comment).append("\n");
+        }
+
+        // Write to the output file
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath))) {
+            writer.write(reportContent.toString());
+        }
+    }
+
 }

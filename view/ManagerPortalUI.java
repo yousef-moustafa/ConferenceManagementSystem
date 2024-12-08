@@ -10,6 +10,7 @@ import model.service.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.io.IOException;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
@@ -147,9 +148,7 @@ public class ManagerPortalUI extends JFrame {
         });
         issueCertificatesButton.addActionListener(e -> issueCertificatesForDisplayedAttendees(certificateService));
 
-        exportFeedbackReportButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Export functionality is under development.");
-        });
+        exportFeedbackReportButton.addActionListener(e -> exportFeedbackReport(feedbackService));
     }
 
     private void loadSpeakers(DefaultTableModel speakerTableModel, SpeakerService speakerService) {
@@ -610,6 +609,27 @@ public class ManagerPortalUI extends JFrame {
         averageFeedbackLabel.setText("Total Responses: " + totalResponses + " | Average Feedback Rating: " + averageRating);
     }
 
+    private void exportFeedbackReport(FeedbackService feedbackService) {
+        // Define the output file path
+        String outputPath = "feedback_report.txt"; // Adjust the path if needed
+
+        try {
+            // Call the FeedbackService method to export the report
+            feedbackService.exportFeedbackReport(outputPath);
+
+            // Notify the user about the success
+            JOptionPane.showMessageDialog(this,
+                    "Feedback report exported successfully to: " + outputPath,
+                    "Export Successful",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException ex) {
+            // Notify the user about the failure
+            JOptionPane.showMessageDialog(this,
+                    "Error exporting feedback report: " + ex.getMessage(),
+                    "Export Failed",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
     private void issueCertificatesForDisplayedAttendees(CertificateService certificateService) {
         try {
