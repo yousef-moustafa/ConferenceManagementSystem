@@ -143,9 +143,4 @@ public class Login extends JFrame {
         dashboard.setLocationRelativeTo(null);
         this.dispose(); // Close the login window
     }
-
-    public static void main(String[] args) {
-        Login login = new Login();
-        login.setLocationRelativeTo(null);
-    }
 }
