@@ -1,8 +1,8 @@
 package view;
 
 import controller.AttendeeController;
-import model.repository.UserRepository;
-import model.service.*;
+import controller.ManagerController;
+import main.ApplicationContext;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -33,21 +33,12 @@ public class AttendeePortalUI extends JFrame {
     private final AttendeeController controller;
 
     public AttendeePortalUI(String attendeeID, String attendeeName) {
+        this.controller = ApplicationContext.getInstance().getAttendeeController();
+
         setContentPane(AttendeePortalUI);
         setTitle("Attendee Portal");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        // Initialize services and controller
-        SessionService sessionService = new SessionService();
-        SpeakerService speakerService = new SpeakerService();
-        FeedbackService feedbackService = new FeedbackService();
-        AttendeeService attendeeService = new AttendeeService(sessionService, feedbackService);
-        CertificateService certificateService = new CertificateService(attendeeService);
-        UserRepository userRepository = new UserRepository();
-        AuthService authService = new AuthService(userRepository);
-
-        controller = new AttendeeController(sessionService, speakerService, attendeeService, certificateService, authService);
 
         // Setup table models
         DefaultTableModel conferenceScheduleTableModel = new DefaultTableModel(

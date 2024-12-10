@@ -4,9 +4,7 @@ import controller.ManagerController;
 import model.domain.enums.SessionStatus;
 import model.dto.SessionDTO;
 import model.dto.SpeakerDTO;
-import model.dto.SpeakerDTO;
-import model.repository.UserRepository;
-import model.service.*;
+import main.ApplicationContext;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -40,9 +38,11 @@ public class ManagerPortalUI extends JFrame {
     private JButton issueCertificatesButton;
     private JButton logoutButton;
 
-    private ManagerController controller;
+    private final ManagerController controller;
 
     public ManagerPortalUI() {
+        this.controller = ApplicationContext.getInstance().getManagerController();
+
         setContentPane(ManagerPortalUI);
         setTitle("Manager Portal");
         setSize(800, 600);
@@ -85,24 +85,6 @@ public class ManagerPortalUI extends JFrame {
                 new String[]{"Feedback ID", "Attendee ID", "Type", "Details"}, 0
         );
         feedbackTable.setModel(feedbackTableModel);
-
-        // Initialize services
-        SpeakerService speakerService = new SpeakerService();
-        SessionService sessionService = new SessionService();
-        FeedbackService feedbackService = new FeedbackService();
-        AttendeeService attendeeService = new AttendeeService(sessionService, feedbackService);
-        CertificateService certificateService = new CertificateService(attendeeService);
-        AuthService authService = new AuthService(new UserRepository());
-
-        // Initialize controller
-        controller = new ManagerController(
-                speakerService,
-                sessionService,
-                feedbackService,
-                attendeeService,
-                certificateService,
-                authService
-        );
 
         // Initial load
         controller.loadSpeakers(speakerTableModel);

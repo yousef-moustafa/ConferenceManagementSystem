@@ -61,6 +61,8 @@ public class UserRepository implements Repository<User> {
     }
 
     public void loadFromFile() {
+        users.clear();
+
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {

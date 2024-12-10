@@ -21,13 +21,12 @@ public class AttendeeService {
 
     private final FeedbackService feedbackService;
 
-    public AttendeeService(SessionService sessionService, FeedbackService feedbackService) {
-        this.userRepository = new UserRepository();
+    public AttendeeService(UserRepository userRepository, SessionService sessionService, FeedbackService feedbackService) {
+        this.userRepository = userRepository;
         this.sessionService = sessionService;
+        this.feedbackService = feedbackService;
         this.schedules = new ArrayList<>();
         loadSchedulesFromFile();
-
-        this.feedbackService = feedbackService;
     }
 
     // Create a new attendee

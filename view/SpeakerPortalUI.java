@@ -1,13 +1,10 @@
 package view;
 
+import controller.ManagerController;
 import controller.SpeakerController;
-import model.repository.UserRepository;
-import model.service.AuthService;
-import model.service.SessionService;
-import model.service.SpeakerService;
+import main.ApplicationContext;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 public class SpeakerPortalUI extends JFrame {
@@ -23,17 +20,12 @@ public class SpeakerPortalUI extends JFrame {
     private final SpeakerController controller;
 
     public SpeakerPortalUI(String speakerID, String speakerName) {
+        this.controller = ApplicationContext.getInstance().getSpeakerController();
+
         setContentPane(SpeakerPortalUI);
         setTitle("Speaker Portal");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        // Initialize services and controller
-        SpeakerService speakerService = new SpeakerService();
-        SessionService sessionService = new SessionService();
-        UserRepository userRepository = new UserRepository();
-        AuthService authService = new AuthService(userRepository);
-        controller = new SpeakerController(speakerService, sessionService, authService);
 
         // Setup table model
         DefaultTableModel speakerSessionTableModel = new DefaultTableModel(

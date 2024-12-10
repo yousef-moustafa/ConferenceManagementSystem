@@ -18,9 +18,10 @@ public class SessionService {
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
 
-    public SessionService() {
-        this.sessionRepository = new SessionRepository();
-        this.userRepository = new UserRepository();
+    // Constructor with dependency injection
+    public SessionService(SessionRepository sessionRepository, UserRepository userRepository) {
+        this.sessionRepository = sessionRepository;
+        this.userRepository = userRepository;
     }
 
     // Create a new session

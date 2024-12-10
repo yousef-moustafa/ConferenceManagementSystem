@@ -19,8 +19,8 @@ public class FeedbackService {
     private final FeedbackRepository feedbackRepository;
 
     // Constructor
-    public FeedbackService() {
-        this.feedbackRepository = new FeedbackRepository();
+    public FeedbackService(FeedbackRepository feedbackRepository) {
+        this.feedbackRepository = feedbackRepository;
     }
 
     // Submit a rating feedback

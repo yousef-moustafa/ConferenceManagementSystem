@@ -1,14 +1,12 @@
 package view;
 
-import model.domain.Attendee;
+import main.ApplicationContext;
 import model.dto.AttendeeDTO;
-import model.repository.UserRepository;
 import model.service.AttendeeService;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,13 +18,10 @@ public class AttendeeRegistrationUI extends JFrame {
     private JLabel errorMessage;
 
     private JPanel AttendeeRegistrationUI;
-    private final UserRepository userRepository;
     private final AttendeeService attendeeService;
 
-    public AttendeeRegistrationUI(AttendeeService attendeeService) {
-        // Initialize UserRepository and AttendeeService
-        this.userRepository = new UserRepository();
-        this.attendeeService = attendeeService;
+    public AttendeeRegistrationUI() {
+        this.attendeeService = ApplicationContext.getInstance().getAttendeeService();
 
         // Setup UI
         setContentPane(AttendeeRegistrationUI);

@@ -8,8 +8,8 @@ import model.dto.DTOMapper;
 public class ConferenceService {
     private final ConferenceRepository conferenceRepository;
 
-    public ConferenceService() {
-        this.conferenceRepository = new ConferenceRepository();
+    public ConferenceService(ConferenceRepository conferenceRepository) {
+        this.conferenceRepository = conferenceRepository;
     }
 
     // Initialize a new conference

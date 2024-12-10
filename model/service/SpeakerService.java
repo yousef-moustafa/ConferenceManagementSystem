@@ -18,9 +18,9 @@ public class SpeakerService {
     private final UserRepository userRepository;
     private final SessionRepository sessionRepository;
 
-    public SpeakerService() {
-        this.userRepository = new UserRepository();
-        this.sessionRepository = new SessionRepository();
+    public SpeakerService(UserRepository userRepository, SessionRepository sessionRepository) {
+        this.userRepository = userRepository;
+        this.sessionRepository = sessionRepository;
     }
 
     // Create a new speaker

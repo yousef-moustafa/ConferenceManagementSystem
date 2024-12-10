@@ -1,13 +1,11 @@
 package view;
 
+import main.ApplicationContext;
 import model.domain.User;
 import model.domain.enums.AuthResult;
 import model.domain.enums.UserRole;
-import model.service.AttendeeService;
 import model.service.AuthService;
-import model.repository.UserRepository;
-import model.service.FeedbackService;
-import model.service.SessionService;
+
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -28,9 +26,8 @@ public class Login extends JFrame {
 
     public Login() {
 
-        // Initialize authService with a UserRepository
-        UserRepository userRepository = new UserRepository();
-        this.authService = new AuthService(userRepository);
+        // Retrieve AuthService from ApplicationContext
+        this.authService = ApplicationContext.getInstance().getAuthService();
 
         // Setup UI
         setContentPane(Login);
@@ -67,12 +64,7 @@ public class Login extends JFrame {
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Create necessary services
-                SessionService sessionService = new SessionService();
-                FeedbackService feedbackService = new FeedbackService();
-                AttendeeService attendeeService = new AttendeeService(sessionService, feedbackService);
-
-                JFrame register = new AttendeeRegistrationUI(attendeeService);
+                JFrame register = new AttendeeRegistrationUI();
                 register.setVisible(true);
                 register.setLocationRelativeTo(null);
                 Login.this.dispose();

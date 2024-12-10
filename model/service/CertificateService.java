@@ -16,8 +16,8 @@ public class CertificateService {
     private final CertificateRepository certificateRepository;
     private final AttendeeService attendeeService;
 
-    public CertificateService(AttendeeService attendeeService) {
-        this.certificateRepository = new CertificateRepository();
+    public CertificateService(CertificateRepository certificateRepository, AttendeeService attendeeService) {
+        this.certificateRepository = certificateRepository;
         this.attendeeService = attendeeService;
     }
 
