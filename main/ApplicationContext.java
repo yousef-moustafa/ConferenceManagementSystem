@@ -18,7 +18,6 @@ public class ApplicationContext {
     private final AuthService authService;
     private final CertificateService certificateService;
     private final FeedbackService feedbackService;
-    private final NotificationService notificationService;
     private final SessionService sessionService;
     private final SpeakerService speakerService;
 
@@ -41,7 +40,6 @@ public class ApplicationContext {
         feedbackService = new FeedbackService(feedbackRepository);
         attendeeService = new AttendeeService(userRepository, sessionService, feedbackService);
         certificateService = new CertificateService(certificateRepository, attendeeService);
-        notificationService = new NotificationService();
         authService = new AuthService(userRepository);
 
         // Initialize controllers
@@ -89,10 +87,6 @@ public class ApplicationContext {
 
     public FeedbackService getFeedbackService() {
         return feedbackService;
-    }
-
-    public NotificationService getNotificationService() {
-        return notificationService;
     }
 
     public SessionService getSessionService() {
