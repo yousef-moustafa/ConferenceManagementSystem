@@ -11,7 +11,7 @@ import java.util.*;
 
 public class UserRepository implements Repository<User> {
     private List<User> users = new ArrayList<>();
-    private File file = new File("users.csv");
+    private File file = new File("data/users.csv");
 
     public UserRepository() {
         loadFromFile();

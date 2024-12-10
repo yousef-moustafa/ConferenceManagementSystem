@@ -6,7 +6,6 @@ import model.domain.User;
 import model.dto.AttendeeDTO;
 import model.dto.DTOMapper;
 import model.repository.UserRepository;
-import model.service.SessionService;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -132,7 +131,7 @@ public class AttendeeService {
     }
 
     private void loadSchedulesFromFile() {
-        File file = new File("schedules.txt");
+        File file = new File("data/schedules.txt");
         if (!file.exists()) return; // Skip loading if the file doesn't exist
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -155,7 +154,7 @@ public class AttendeeService {
     }
 
     private void saveSchedulesToFile() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("schedules.txt"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("data/schedules.txt"))) {
             for (PersonalizedSchedule schedule : schedules) {
                 writer.write(schedule.toString());
                 writer.newLine();

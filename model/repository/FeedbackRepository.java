@@ -4,13 +4,11 @@ import model.domain.Feedback;
 import model.domain.RatingFeedback;
 import model.domain.CommentFeedback;
 import java.io.*;
-import java.time.LocalDateTime;
 import java.util.*;
-import java.time.format.DateTimeFormatter;
 
 public class FeedbackRepository implements Repository<Feedback> {
     private List<Feedback> feedbackList = new ArrayList<>();
-    private File file = new File("feedback.csv");
+    private File file = new File("data/feedback.csv");
 
     public FeedbackRepository() {
         loadFromFile();

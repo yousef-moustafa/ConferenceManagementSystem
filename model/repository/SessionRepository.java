@@ -7,13 +7,12 @@ import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class SessionRepository implements Repository<Session> {
     private ArrayList<Session> sessions = new ArrayList<>();
-    private File file = new File("sessions.csv");
+    private File file = new File("data/sessions.csv");
 
     // Load sessions from file when repository is initialized
     public SessionRepository() {

@@ -9,7 +9,7 @@ import java.util.*;
 
 public class CertificateRepository implements Repository<Certificate> {
     private List<Certificate> certificates = new ArrayList<>();
-    private File file = new File("certificates.csv");
+    private File file = new File("data/certificates.csv");
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public CertificateRepository() {
