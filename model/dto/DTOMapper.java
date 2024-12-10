@@ -3,7 +3,6 @@ package model.dto;
 import model.domain.Session;
 import model.domain.Attendee;
 import model.domain.Speaker;
-import model.domain.Conference;
 import model.domain.Certificate;
 import model.domain.Feedback;
 import model.domain.CommentFeedback;
@@ -117,34 +116,6 @@ public class DTOMapper {
         );
         return speaker;
     }
-
-    // Conference mappings
-    public static ConferenceDTO mapConferenceToDTO(Conference conference) {
-        if (conference == null) {
-            return null;
-        }
-
-        return new ConferenceDTO(
-                conference.getConferenceID(),
-                conference.getConferenceName(),
-                conference.getStartDate(),
-                conference.getEndDate()
-        );
-    }
-
-    public static Conference mapDTOToConference(ConferenceDTO dto) {
-        if (dto == null) {
-            return null;
-        }
-
-        Conference conference = new Conference();
-        conference.setConferenceName(dto.getConferenceName());
-        conference.setStartDate(dto.getStartDate());
-        conference.setEndDate(dto.getEndDate());
-        conference.setConferenceID(dto.getConferenceID()); // Explicitly set the ID
-        return conference;
-    }
-
 
     // Certificate mapping
     public static CertificateDTO mapCertificateToDTO(Certificate certificate) {

@@ -57,25 +57,6 @@ public class FeedbackService {
         return newFeedback.getFeedbackID();
     }
 
-    // Update an existing feedback
-    public void updateFeedback(String feedbackID, Feedback updatedFeedback) {
-        Feedback existingFeedback = feedbackRepository.findById(feedbackID);
-        if (existingFeedback == null) {
-            throw new IllegalArgumentException("Feedback with ID " + feedbackID + " does not exist.");
-        }
-        feedbackRepository.delete(feedbackID);
-        feedbackRepository.save(updatedFeedback);
-    }
-
-    // Retrieve a single feedback by its ID
-    public Feedback getFeedback(String feedbackID) {
-        Feedback feedback = feedbackRepository.findById(feedbackID);
-        if (feedback == null) {
-            throw new IllegalArgumentException("Feedback with ID " + feedbackID + " not found.");
-        }
-        return feedback;
-    }
-
     // Retrieve all feedback
     public List<FeedbackDTO> getAllFeedback() {
         List<Feedback> feedbackList = feedbackRepository.findAll();
@@ -87,15 +68,6 @@ public class FeedbackService {
         }
 
         return feedbackDTOs;
-    }
-
-
-    // Retrieve all feedback for a specific attendee
-    public List<FeedbackDTO> getAttendeeAllFeedback(String attendeeID) {
-        return feedbackRepository.findAll().stream()
-                .filter(feedback -> feedback.getAttendeeID().equals(attendeeID))
-                .map(DTOMapper::mapFeedbackToDTO)
-                .toList();
     }
 
     // Generate a feedback report for the conference

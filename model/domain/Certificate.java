@@ -45,10 +45,6 @@ public class Certificate {
         return issueDate;
     }
 
-    public CertificateStatus getStatus() {
-        return status;
-    }
-
     // Setters
     public void setStatus(CertificateStatus status) {
         this.status = status;

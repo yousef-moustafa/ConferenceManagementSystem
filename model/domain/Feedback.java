@@ -31,10 +31,6 @@ public abstract class Feedback {
         return attendeeID;
     }
 
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
     @Override
     public String toString() {
         return feedbackID + ", " + attendeeID + ", " + timestamp.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);

@@ -121,25 +121,6 @@ public class SessionService {
         return new ArrayList<>();
     }
 
-    // Update session status
-    public void updateSessionStatus(String sessionId, SessionStatus status) {
-        Session session = sessionRepository.findById(sessionId);
-        if (session != null) {
-            session.setStatus(status);
-            sessionRepository.save(session);
-        }
-    }
-
-    public void notifySessionCancellation(String sessionId) {
-        Session session = sessionRepository.findById(sessionId);
-        // if (session != null) {
-        // for (String attendeeId : session.getAttendeeIDs()) {
-        // Commented out until NotificationService is implemented
-        // sendNotification(attendeeId, "Session " + session.getSessionName() + " has been cancelled.");
-        // }
-        //}
-    }
-
     // Assign a session to a speaker
     public void assignSessionToSpeaker(String speakerID, String sessionID) {
         userRepository.loadFromFile();
@@ -173,14 +154,5 @@ public class SessionService {
         // Persist the updated session
         sessionRepository.save(session);
     }
-
-    // Method to handle bulk attendance updates (if needed)
-    public void markAttendance(String sessionID, Map<String, Boolean> attendanceMap) {
-        for (Map.Entry<String, Boolean> entry : attendanceMap.entrySet()) {
-            markAttendance(sessionID, entry.getKey(), entry.getValue());
-        }
-    }
-
-
 
 }

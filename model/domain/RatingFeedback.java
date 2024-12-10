@@ -21,10 +21,6 @@ public class RatingFeedback extends Feedback {
         this.rating = rating;
     }
 
-    public int getMaxRating() {
-        return maxRating;
-    }
-
     @Override
     public String toString() {
         return "RATING, " + super.toString() + ", " + rating;

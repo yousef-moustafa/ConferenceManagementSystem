@@ -47,16 +47,6 @@ public class AttendeeService {
         return attendee.getUserID(); // Return the new attendee's ID
     }
 
-    // Update an existing attendee's profile
-    public void updateAttendeeProfile(String attendeeID, AttendeeDTO attendeeDTO) {
-        Attendee attendee = (Attendee) userRepository.findById(attendeeID);
-        if (attendee != null) {
-            attendee.setUserName(attendeeDTO.getName());
-            attendee.setEmail(attendeeDTO.getEmail());
-            userRepository.save(attendee);
-        }
-    }
-
     // Get an attendee's profile
     public AttendeeDTO getAttendeeProfile(String attendeeID) {
         Attendee attendee = (Attendee) userRepository.findById(attendeeID);
@@ -69,17 +59,6 @@ public class AttendeeService {
                 .filter(schedule -> schedule.getAttendeeID().equals(attendeeID))
                 .findFirst()
                 .orElse(null);
-    }
-
-    // Update an attendee's personalized schedule
-    public boolean updateAttendeePersonalizedSchedule(String attendeeID, List<String> sessionIDs) {
-        PersonalizedSchedule schedule = getAttendeeSchedule(attendeeID);
-        if (schedule != null) {
-            schedule.getSessionsIDs().clear();
-            schedule.getSessionsIDs().addAll(sessionIDs);
-            return schedule.validateSchedule(); // Return true if the schedule is valid
-        }
-        return false; // Schedule not found
     }
 
     // Register an attendee for a session

@@ -25,20 +25,12 @@ public class Attendee extends User {
         return personalizedScheduleID;
     }
 
+    public Set<String> getAttendedSessions() {
+        return attendedSessions;
+    }
+
     public void setPersonalizedScheduleID(String personalizedScheduleID) { // Add this setter
         this.personalizedScheduleID = personalizedScheduleID;
-    }
-
-    public String getCertificateID() {
-        return certificateID;
-    }
-
-    public String getRatingFeedbackID() {
-        return ratingFeedbackID;
-    }
-
-    public String getCommentFeedbackID() {
-        return commentFeedbackID;
     }
 
     public void setRatingFeedbackID(String ratingFeedbackID) {
@@ -47,14 +39,6 @@ public class Attendee extends User {
 
     public void setCommentFeedbackID(String commentFeedbackID) {
         this.commentFeedbackID = commentFeedbackID;
-    }
-
-    public Set<String> getAttendedSessions() {
-        return attendedSessions;
-    }
-
-    public void setAttendedSessions(Set<String> attendedSessions) {
-        this.attendedSessions = attendedSessions;
     }
 
     public void setCertificateID(String certificateID) {

@@ -12,13 +12,11 @@ public class ApplicationContext {
     private final SessionRepository sessionRepository;
     private final FeedbackRepository feedbackRepository;
     private final CertificateRepository certificateRepository;
-    private final ConferenceRepository conferenceRepository;
 
     // Services
     private final AttendeeService attendeeService;
     private final AuthService authService;
     private final CertificateService certificateService;
-    private final ConferenceService conferenceService;
     private final FeedbackService feedbackService;
     private final NotificationService notificationService;
     private final SessionService sessionService;
@@ -36,7 +34,6 @@ public class ApplicationContext {
         sessionRepository = new SessionRepository();
         feedbackRepository = new FeedbackRepository();
         certificateRepository = new CertificateRepository();
-        conferenceRepository = new ConferenceRepository();
 
         // Initialize services
         sessionService = new SessionService(sessionRepository, userRepository);
@@ -44,7 +41,6 @@ public class ApplicationContext {
         feedbackService = new FeedbackService(feedbackRepository);
         attendeeService = new AttendeeService(userRepository, sessionService, feedbackService);
         certificateService = new CertificateService(certificateRepository, attendeeService);
-        conferenceService = new ConferenceService(conferenceRepository);
         notificationService = new NotificationService();
         authService = new AuthService(userRepository);
 
@@ -78,10 +74,6 @@ public class ApplicationContext {
         return certificateRepository;
     }
 
-    public ConferenceRepository getConferenceRepository() {
-        return conferenceRepository;
-    }
-
     // Getters for Services
     public AttendeeService getAttendeeService() {
         return attendeeService;
@@ -93,10 +85,6 @@ public class ApplicationContext {
 
     public CertificateService getCertificateService() {
         return certificateService;
-    }
-
-    public ConferenceService getConferenceService() {
-        return conferenceService;
     }
 
     public FeedbackService getFeedbackService() {

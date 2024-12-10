@@ -39,10 +39,6 @@ public class User {
         return email;
     }
 
-    public LocalDate getRegistrationDate() {
-        return registrationDate;
-    }
-
     public UserRole getUserRole() {
         return userRole;
     }
