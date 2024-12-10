@@ -26,8 +26,9 @@ public class AttendeePortalUI extends JFrame {
     private JLabel myScheduleHeaderLabel;
     private JLabel certificateHeaderLabel;
     private JLabel noCertificateLabel;
-    private JTextArea certificateDetails;
+    private JTextPane certificateDetails;
     private JButton logoutButton;
+    private JLabel logoLabel;
 
     private final AttendeeController controller;
 

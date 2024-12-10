@@ -304,23 +304,14 @@
                           <text value=""/>
                         </properties>
                       </component>
-                      <scrollpane id="2899b">
+                      <component id="56526" class="javax.swing.JTextPane" binding="certificateDetails">
                         <constraints>
-                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                            <preferred-size width="150" height="50"/>
+                          </grid>
                         </constraints>
                         <properties/>
-                        <border type="none"/>
-                        <children>
-                          <component id="7fb2b" class="javax.swing.JTextArea" binding="certificateDetails">
-                            <constraints/>
-                            <properties>
-                              <editable value="false"/>
-                              <enabled value="true"/>
-                              <font name="Bookman Old Style" size="20"/>
-                            </properties>
-                          </component>
-                        </children>
-                      </scrollpane>
+                      </component>
                     </children>
                   </grid>
                   <hspacer id="53839">

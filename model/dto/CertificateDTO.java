@@ -37,12 +37,11 @@ public class CertificateDTO {
                 '}';
     }
 
-    public String getDisplayString() {
-        return "\n\n                                         Certificate of Attendance\n\n\n" +
-                "       Certificate ID: " + certificateID + "\n\n" +
-                "       Attendee ID: " + attendeeID + "\n\n" +
-                "       Conference: " + conferenceName + "\n\n" +
-                "       Issue Date: " + issueDate + "\n\n\n\n" +
+    public String getDisplayString(String attendeeName) {
+        return "This is to certify that " + attendeeName + "\n" +
+                "has participated in the " + conferenceName + " conference.\n\n" +
+                "Certificate ID: " + certificateID + "\n" +
+                "Issue Date: " + issueDate + "\n\n\n\n" +
                 "                                                                             ______________________\n" +
                 "                                                                               Conference Manager";
     }

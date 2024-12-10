@@ -1,6 +1,7 @@
 package controller;
 
 import model.domain.PersonalizedSchedule;
+import model.dto.AttendeeDTO;
 import model.dto.CertificateDTO;
 import model.dto.SessionDTO;
 import model.dto.SpeakerDTO;
@@ -142,14 +143,28 @@ public class AttendeeController {
         }
     }
 
-    public void initializeCertificateTab(JLabel noCertificateLabel, JTextArea certificateDetails, String attendeeID) {
+    public void initializeCertificateTab(JLabel noCertificateLabel, JTextPane certificateDetails, String attendeeID) {
         try {
             CertificateDTO certificate = certificateService.getCertificateForAttendee(attendeeID);
+            AttendeeDTO attendee = attendeeService.getAttendeeProfile(attendeeID);
 
             noCertificateLabel.setVisible(false);
             certificateDetails.setVisible(true);
             certificateDetails.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-            certificateDetails.setText(certificate.getDisplayString());
+            // Prepare HTML content with the logo and certificate text
+            String logoPath = getClass().getClassLoader().getResource("university_logo.png").toString();
+            String htmlContent = "<html><br><div style='text-align: center; font-size: 16px;'>"
+                    + "<img src='" + logoPath + "' width='260' height='48'/><br><br>"
+                    + "<span style='font-size: 18px; font-weight: bold;'>Certificate of Attendance</span><br><br>"
+                    + "<span style='font-size: 14px;'>"
+                    + certificate.getDisplayString(attendee.getName()).replace("\n", "<br>")
+                    + "</span>"
+                    + "</div></html>";
+
+            certificateDetails.setContentType("text/html");
+            certificateDetails.setText(htmlContent);
+            certificateDetails.setEditable(false);
+
         } catch (IllegalArgumentException e) {
             noCertificateLabel.setVisible(true);
             certificateDetails.setVisible(false);
